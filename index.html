@@ -460,8 +460,9 @@
 </div>
 </section>
 <section class="hide" id="screen_relatorio">
-<div class="card" id="printArea">
-<div class="head" id="tituloAvaliacao">AVALIAÇÃO 001</div>
+  <div class="card">
+<div  id="printArea">
+<div class="head" id="tituloAvaliacao2">AVALIAÇÃO 001</div>
 <div class="body">
 <div class="table">
 <div class="r"><div class="k">Data:</div><div class="v" id="relData">—</div></div>
@@ -479,7 +480,7 @@
 <div class="blueHead">Dados da Carga</div>
 <div class="table" id="relCarga"></div>
 <div style="height:12px;"></div>
-<div class="blueHead">Métricas (75%)</div>
+<div class="blueHead" style="page-break-before: always;">Métricas (75%)</div>
 <div class="table" id="relMet"></div>
 <div style="height:12px;"></div>
 <div class="blueHead">Isolamento (DMI mínimo)</div>
@@ -487,9 +488,10 @@
 <div style="height:12px;"></div>
 <div class="blueHead">Checklist Realizado</div>
 <div class="table" id="relCheck"></div>
-<div class="card" <div class="blueHead">Checklist de Acessórios (Cintas e Manilhas)</div>
+<!-- <div class="card"  -->
+<div class="blueHead" style="page-break-before: always;">Checklist de Acessórios (Cintas e Manilhas)</div>
 <div class="table" id="relAcess"></div>
-id="assinaturasCard" style="margin-top:12px;">
+<!-- id="assinaturasCard" style="margin-top:12px;"> -->
   <div class="head">Assinaturas (visualização antes do PDF)</div>
   <div class="body">
     <div class="mini" style="margin-bottom:10px;">Assine nos campos abaixo. As assinaturas ficam salvas neste dispositivo (até você limpar) e entram no PDF gerado.</div>
@@ -502,7 +504,7 @@ id="assinaturasCard" style="margin-top:12px;">
           <input class="inrow" id="sig_nome_operador" type="text" placeholder="Nome do operador"/>
         </div>
         <canvas class="sigCanvas" id="sig_canvas_operador" width="900" height="260"></canvas>
-        <div class="sigActions">
+        <div class="sigActions" id="sign1">
           <button class="btnAlt" type="button" id="sig_clear_operador">Limpar</button>
           <div class="mini">Data/Hora: <span id="sig_dt_operador">—</span></div>
         </div>
@@ -514,7 +516,7 @@ id="assinaturasCard" style="margin-top:12px;">
           <input class="inrow" id="sig_nome_encarregado" type="text" placeholder="Nome do encarregado responsável"/>
         </div>
         <canvas class="sigCanvas" id="sig_canvas_encarregado" width="900" height="260"></canvas>
-        <div class="sigActions">
+        <div class="sigActions" id="sign2">
           <button class="btnAlt" type="button" id="sig_clear_encarregado">Limpar</button>
           <div class="mini">Data/Hora: <span id="sig_dt_encarregado">—</span></div>
         </div>
@@ -526,8 +528,8 @@ id="assinaturasCard" style="margin-top:12px;">
 <div style="height:12px;"></div>
 
 
-<div class="statusBox">
-<div class="statusLine" id="relStatus" class="statusLine">RESULTADO: NÃO LIBERADO</div>
+<div class="statusBox" style="page-break-before: always;">
+<div class="statusLine" id="relStatus" class="statusLine" >RESULTADO: NÃO LIBERADO</div>
 </div>
 
 <!-- Parecer técnico: apenas na impressão (nova página) -->
@@ -539,12 +541,12 @@ id="assinaturasCard" style="margin-top:12px;">
     </div>
   </div>
 </div>
+</div>
 <div style="margin-top:12px;">
 <button class="btnAlt" id="btnPrint">Visualizar Impressão</button>
 
 <div style="height:10px;"></div>
 <button class="btn" id="btnPdfFile">Gerar PDF</button>
-
 <div style="margin-top:10px;"><button class="btn" id="btnNovaAvaliacao" style="background:#0f172a;width:100%;display:block;margin:0 auto;">Nova Avaliação</button></div>
 </div>
 </div>
@@ -560,6 +562,7 @@ id="assinaturasCard" style="margin-top:12px;">
 </nav>
 </div>
 <script>
+  console.log("loaded");
 (function(){
  const $ = (id)=>document.getElementById(id);
  const escapeHTML = (s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
@@ -955,9 +958,10 @@ id="assinaturasCard" style="margin-top:12px;">
  } else {
    relStatus.textContent = 'RESULTADO: NÃO LIBERADO';
    relStatus.classList.remove('ok');
+  //  <div class="mini" style="color:var(--text);text-align:justify;text-justify:inter-word;hyphens:auto;">
    relMotivo.innerHTML =
      `<div style="font-weight:1000;margin-bottom:2px;">PARECER TÉCNICO – OPERAÇÃO NÃO LIBERADA</div>
-      <div class="mini" style="color:var(--text);text-align:justify;text-justify:inter-word;hyphens:auto;">
+      <div class="mini" style="color:var(--text);text-align:justify;hyphens:auto;">
         Após análise técnica das condições operacionais, foram identificadas não conformidades e/ou restrições que comprometem os critérios mínimos de segurança exigidos para a movimentação de carga.<br>
         As inconsistências verificadas envolvem aspectos relacionados às condições ambientais, checklist operacional, parâmetros técnicos da carga e/ou acessórios utilizados, impossibilitando a liberação da atividade até que as pendências apontadas sejam devidamente corrigidas e reavaliadas.
       </div>
@@ -1091,25 +1095,36 @@ id="assinaturasCard" style="margin-top:12px;">
  ];
  return lines;
  }
+
+const buttonGeneratePdf = document.getElementById("btnPdfFile")
+buttonGeneratePdf.addEventListener("click", ()=> {
+  gerarPDFArquivo();
+})
  // PDF fiel ao layout: usa a mesma visualização de impressão (Salvar como PDF)
- $('btnPdfFile').onclick = ()=>{ gerarPDFArquivo(); };
+//  $('btnPdfFile').onclick = ()=>{ 
+//   console.log("test")
+//   gerarPDFArquivo(); };
  
 async function gerarPDFArquivo(){
   // Baixa automaticamente o PDF do RELATÓRIO VISUALIZADO (sem mudar layout/fluxo).
   // Requer internet para carregar a biblioteca html2pdf. Se indisponível, cai em impressão (Salvar como PDF).
   try{ renderRelatorio(); }catch(e){}
-  try{ initAssinaturas(); }catch(e){}
-  try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
-  try{ swapSigToImg(true); }catch(e){}
-  try{ swapSigNamesToText(true); }catch(e){}
+
 
   if (typeof html2pdf === 'undefined'){
+    console.log("typeof html2pdf: ", typeof html2pdf)
     window.print();
     return;
   }
+  
+  // const area = document.getElementById('printArea');
+  // const area = document.createElement("div")
+  const area = document.getElementById("printArea")
+// document.getElementById("sig_clear_encarregado").style.display = "none"
 
-  const area = document.getElementById('printArea');
+
   if(!area){
+    console.log("!area")
     window.print();
     return;
   }
@@ -1120,7 +1135,7 @@ async function gerarPDFArquivo(){
   if(parecer){
     appended = parecer.cloneNode(true);
     appended.style.display = 'block';
-    appended.style.pageBreakBefore = 'always';
+    // appended.style.pageBreakBefore = 'always';
     area.appendChild(appended);
   }
 
@@ -1130,10 +1145,11 @@ async function gerarPDFArquivo(){
 
   // Nome do arquivo
   const safe = (s)=>String(s||'').replace(/[\/\:*?\"<>|]+/g,'-').trim();
-  const dataTxt = safe(document.getElementById('relData')?.textContent) || 'Relatorio';
+  // const dataTxt = safe(document.getElementById('relData')?.textContent) || 'Relatorio';
   const titulo = safe(document.getElementById('tituloAvaliacao')?.textContent) || 'Avaliacao';
-  const local = safe(document.getElementById('relLocal')?.textContent) || '';
-  const filename = [titulo, dataTxt, local].filter(Boolean).join(' - ') + '.pdf';
+  // const local = safe(document.getElementById('relLocal')?.textContent) || '';
+  const filename = `Relatório - ${titulo}.pdf`;
+  // const filename = [titulo, dataTxt, local].filter(Boolean).join(' - ') + '.pdf';
 
   const opt = {
     margin: 5,
@@ -1149,28 +1165,97 @@ async function gerarPDFArquivo(){
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
   };
 
+  document.getElementById("sign1").style.display = "none"
+  document.getElementById("sign2").style.display = "none"
   try{
     await html2pdf().set(opt).from(area).save();
   }catch(e){
     window.print();
   }finally{
+    document.getElementById("sign1").style.display = "flex"
+  document.getElementById("sign2").style.display = "flex"
     try{ if(appended) appended.remove(); }catch(e){}
-    try{ swapSigToImg(false); }catch(e){}
-    try{ swapSigNamesToText(false); }catch(e){}
     try{ window.scrollTo(0, prevScrollY); }catch(e){}
   }
 }
 
-$('btnPrint').onclick = ()=>{
- renderRelatorio();
- try{ initAssinaturas(); }catch(e){}
- try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
- try{ swapSigToImg(true); }catch(e){}
-  try{ swapSigNamesToText(true); }catch(e){}
- window.print();
- setTimeout(()=>{ try{ swapSigToImg(false); }catch(e){}
-    try{ swapSigNamesToText(false); }catch(e){} }, 1200);
- };
+// async function gerarPDFArquivo(){
+//   // Baixa automaticamente o PDF do RELATÓRIO VISUALIZADO (sem mudar layout/fluxo).
+//   // Requer internet para carregar a biblioteca html2pdf. Se indisponível, cai em impressão (Salvar como PDF).
+//   try{ renderRelatorio(); }catch(e){}
+//   try{ initAssinaturas(); }catch(e){}
+//   try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
+//   try{ swapSigToImg(true); }catch(e){}
+//   try{ swapSigNamesToText(true); }catch(e){}
+
+//   if (typeof html2pdf === 'undefined'){
+//     window.print();
+//     return;
+//   }
+
+//   const area = document.getElementById('printArea');
+//   if(!area){
+//     window.print();
+//     return;
+//   }
+
+//   // Anexa o parecer técnico como última página somente para o PDF (clone temporário)
+//   const parecer = document.getElementById('relParecerPrint');
+//   let appended = null;
+//   if(parecer){
+//     appended = parecer.cloneNode(true);
+//     appended.style.display = 'block';
+//     appended.style.pageBreakBefore = 'always';
+//     area.appendChild(appended);
+//   }
+
+//   const prevScrollY = window.scrollY || 0;
+//   try{ window.scrollTo(0,0); }catch(e){}
+//   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+//   // Nome do arquivo
+//   const safe = (s)=>String(s||'').replace(/[\/\:*?\"<>|]+/g,'-').trim();
+//   const dataTxt = safe(document.getElementById('relData')?.textContent) || 'Relatorio';
+//   const titulo = safe(document.getElementById('tituloAvaliacao')?.textContent) || 'Avaliacao';
+//   const local = safe(document.getElementById('relLocal')?.textContent) || '';
+//   const filename = [titulo, dataTxt, local].filter(Boolean).join(' - ') + '.pdf';
+
+//   const opt = {
+//     margin: 5,
+//     filename,
+//     image: { type: 'jpeg', quality: 0.98 },
+//     html2canvas: {
+//       scale: 2,
+//       useCORS: true,
+//       backgroundColor: '#ffffff',
+//       scrollX: 0,
+//       scrollY: 0
+//     },
+//     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+//   };
+
+//   try{
+//     await html2pdf().set(opt).from(area).save();
+//   }catch(e){
+//     window.print();
+//   }finally{
+//     try{ if(appended) appended.remove(); }catch(e){}
+//     try{ swapSigToImg(false); }catch(e){}
+//     try{ swapSigNamesToText(false); }catch(e){}
+//     try{ window.scrollTo(0, prevScrollY); }catch(e){}
+//   }
+// }
+
+// $('btnPrint').onclick = ()=>{
+//  renderRelatorio();
+//  try{ initAssinaturas(); }catch(e){}
+//  try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
+//  try{ swapSigToImg(true); }catch(e){}
+//   try{ swapSigNamesToText(true); }catch(e){}
+//  window.print();
+//  setTimeout(()=>{ try{ swapSigToImg(false); }catch(e){}
+//     try{ swapSigNamesToText(false); }catch(e){} }, 1200);
+//  };
 })();
 </script>
 <!-- Modal: Checklist de Acessórios (Cintas/Manilhas) -->
@@ -1269,6 +1354,10 @@ $('btnPrint').onclick = ()=>{
  window.addEventListener('DOMContentLoaded', function(){
  // Inicializa ID ao abrir o app
  idAvaliacaoAtual = gerarIdTecnico();
+ const titulos = document.getElementById('tituloAvaliacao');
+ const titulos2 = document.getElementById('tituloAvaliacao2');
+ if(titulos) titulos.innerText = idAvaliacaoAtual ? ('AVALIAÇÃO ' + idAvaliacaoAtual) : 'AVALIAÇÃO';
+ if(titulos2) titulos2.innerText = idAvaliacaoAtual ? ('AVALIAÇÃO ' + idAvaliacaoAtual) : 'AVALIAÇÃO';
  aplicarId();
  // Data/hora em tempo real no início
  atualizarDataHoraTempoReal();
@@ -1297,6 +1386,10 @@ $('btnPrint').onclick = ()=>{
  btnNova.addEventListener('click', function(ev){
  ev.preventDefault();
  ev.stopPropagation();
+
+document.getElementById("sig_clear_operador").click()
+document.getElementById("sig_clear_encarregado").click()
+
  novaAvaliacao();
  }, true);
  }
@@ -1428,10 +1521,6 @@ $('btnPrint').onclick = ()=>{
   .statusLine{ font-weight:900; text-align:center; }
   .mini{ font-size:11px; line-height:1.35; white-space:pre-line; }
 
-  /* Quebra de página do parecer */
-  .pagebreak{break-before:auto; page-break-before:auto;}
-  .somente-print{ display:block !important; }
-
   /* Nunca imprimir botões/nav */
   button, .nav, .topbar { display:none !important; }
 </style>
@@ -1504,7 +1593,7 @@ ${clone.outerHTML}
 
   // Reaponta os botões para o método estável (PDF = salvar como PDF)
   if($('btnPrint')) $('btnPrint').onclick = imprimirRelatorio;
-  if($('btnPdfFile')) $('btnPdfFile').onclick = imprimirRelatorio;
+  // if($('btnPdfFile')) $('btnPdfFile').onclick = imprimirRelatorio;
 
 })();
 
