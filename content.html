@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>AXIS</title>
+<meta content="#0b5fb6" name="theme-color"/>
+<style>
+ :root{
+ --blue:#0b5fb6; --blue2:#0a4f98;
+ --bg:#eef2f7; --card:#ffffff;
+ --text:#0f172a; --muted:#64748b;
+ --line:#d7dee9; --ok:#1f8f3a; --bad:#b42318;
+ --shadow: 0 10px 24px rgba(15,23,42,.08);
+ --radius:14px;
+ }
+ canvas{
+  background-color: white;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text);}
+ .app{max-width:420px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative;}
+ .topbar{position:sticky; top:0; z-index:20; background:linear-gradient(180deg,var(--blue),var(--blue2)); color:#fff; padding:14px 14px 10px; box-shadow:0 6px 18px rgba(2,6,23,.18);}
+ .topbar .row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+ .brand{display:flex; align-items:center; gap:10px;}
+ .brandimg{height:46px;width:auto;display:block;filter: drop-shadow(0 6px 10px rgba(15,23,42,.18));}
+ @media (max-width:380px){
+ .brandimg{height:40px;}
+ }
+ .logo{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:1000;letter-spacing:.5px;}
+ .brand .title{line-height:1.05}
+ .brand .title b{display:block; font-size:15px; letter-spacing:.2px}
+ .brand .title span{font-size:10px; opacity:.9}
+ .iconbtn{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;border:1px solid rgba(255,255,255,.22);user-select:none;font-weight:900;}
+ .osbar{margin-top:10px;}
+ .osbar .pill{background:#ffffff;color:#0f172a;border:1px solid rgba(255,255,255,.55);display:inline-block;padding:8px 10px;border-radius:12px;font-weight:1000;font-size:13px;min-width:88px;}
+ main{padding:12px 12px 86px;}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px;}
+ .card .head{padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--line);font-weight:1000;font-size:13px;display:flex;align-items:center;justify-content:space-between;}
+ .card .body{padding:12px;}
+ .table{width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+ .r{display:flex;justify-content:space-between;gap:10px;padding:12px 12px;border-bottom:1px solid var(--line);font-size:13px;background:#fff;align-items:flex-start;flex-wrap:wrap;}
+ .r:last-child{border-bottom:0;}
+ .k{color:#0f172a;font-weight:900;flex:1 1 52%;min-width:160px;}
+ .unit{color:var(--muted);font-weight:900;font-size:12px;}
+ .v{color:#0f172a;font-weight:1000;flex:1 1 40%;min-width:140px;text-align:right;word-break:break-word;}
+ .mini{font-size:12px;color:var(--muted);line-height:1.35;}
+ input, select{width:100%;padding:10px 10px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:14px;outline:none;}
+ input:focus, select:focus{border-color:#87b3e6;box-shadow:0 0 0 3px rgba(11,95,182,.12);}
+ .inrow{padding:0;border:0;outline:none;font-weight:1000;text-align:right;width:160px;max-width:190px;font-size:14px;background:transparent;}
+ .cgRow{display:flex;align-items:center;gap:14px;padding:8px 2px 2px;font-size:13px;font-weight:900;}
+ .cgRow label{display:flex;align-items:center;gap:8px;}
+ .cgRow input{width:auto}
+ .subcardHead{padding:10px 12px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;font-weight:1000;font-size:13px;margin-bottom:10px;}
+ .picklist{display:grid;gap:10px;}
+ .pick{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:12px 12px;background:#fff;cursor:pointer;user-select:none;}
+ .left{display:flex;align-items:center;gap:10px;font-weight:900;font-size:13px;}
+ .radioDot{width:18px;height:18px;border-radius:999px;border:2px solid #cbd5e1;display:grid;place-items:center;}
+ .radioDot::after{content:'';width:8px;height:8px;border-radius:999px;background:#0b5fb6;opacity:0;}
+ .pick.on .radioDot{border-color:#0b5fb6;}
+ .pick.on .radioDot::after{opacity:1;}
+ .checkMark{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;font-weight:1000;color:#0b5fb6;background:#fff;opacity:.35;}
+ .pick.on .checkMark{background:rgba(11,95,182,.10);border-color:rgba(11,95,182,.35);opacity:1;}
+ .stepper{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 10px;background:#fff;}
+ .stepper .val{font-weight:1000;font-size:16px;}
+ .stepper button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:1000;cursor:pointer;}
+ .btn{width:100%;border:none;background:linear-gradient(180deg,#1677d8,#0b5fb6);color:#fff;padding:14px 14px;border-radius:14px;font-weight:1000;font-size:15px;cursor:pointer;box-shadow:0 10px 18px rgba(11,95,182,.22);}
+ .btn:active{transform:translateY(1px);}
+ .btnAlt{width:100%;border:1px solid var(--line);background:#fff;color:#0b5fb6;padding:14px 14px;border-radius:14px;font-weight:1000;font-size:15px;cursor:pointer;}
+ .btnAlt:active{transform:translateY(1px);}
+ .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(420px,100%);background:#fff;border-top:1px solid var(--line);display:flex;padding:8px 6px;gap:6px;z-index:30;}
+ .nav button{flex:1;background:transparent;border:0;padding:8px 8px;border-radius:12px;cursor:pointer;color:var(--muted);font-weight:1000;font-size:11px;}
+ .nav button.active{background:rgba(11,95,182,.10);color:#0b5fb6;}
+ .nav .ico{display:block;font-size:18px;margin-bottom:4px;}
+ .secHeader{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#1677d8,#0b5fb6);color:#fff;padding:10px 12px;font-weight:1000;font-size:13px;border-radius:12px;margin-bottom:10px;}
+ .qrow{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 10px;background:#fff;margin-bottom:10px;font-size:13px;font-weight:900;}
+ .pillYN{min-width:68px;text-align:center;padding:8px 10px;border-radius:10px;font-weight:1000;border:1px solid var(--line);user-select:none;cursor:pointer;}
+ .pillYN.ok{background:rgba(31,143,58,.12);border-color:rgba(31,143,58,.35);color:var(--ok);}
+ .pillYN.bad{background:rgba(180,35,24,.12);border-color:rgba(180,35,24,.35);color:var(--bad);}
+ /* Acessórios - layout mais compacto (evita sobreposição em telas menores) */
+ .list{display:grid;gap:10px;}
+ .li{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 10px;background:#fff;}
+ .li .txt{flex:1;min-width:0;}
+ .li .txt b{display:block;font-size:13px;}
+ .li .mut{color:var(--muted);font-size:12px;line-height:1.3;margin-top:4px;}
+ .list .pillYN{min-width:54px;padding:6px 8px;font-size:12px;border-radius:10px;}
+ .blueHead{background:linear-gradient(180deg,#1677d8,#0b5fb6);color:#fff;padding:10px 12px;font-weight:1000;font-size:13px;border-radius:12px;margin-bottom:10px;}
+ .statusBox{margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;}
+ .statusLine{font-weight:1000;color:var(--bad);}
+ .statusLine.ok{color:var(--ok);}
+ .hide{display:none;}
+ @media print{
+ body{background:#fff;}
+ .topbar,.nav,.btn,.btnAlt{display:none !important;}
+ main{padding:0;}
+ .app{max-width:none; margin:0; min-height:auto;}
+ .card{box-shadow:none; border:0; margin:0;}
+ .card .head{background:#fff; border-bottom:1px solid #ddd;}
+ .blueHead,.secHeader{background:#0b5fb6 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; color:#fff !important;}
+ .r{display:flex;justify-content:space-between;gap:10px;padding:12px 12px;border-bottom:1px solid var(--line);font-size:13px;background:#fff;align-items:flex-start;flex-wrap:wrap;}
+ }
+ button.pillYN{appearance:none;-webkit-appearance:none;background:transparent;}
+ .pillYN{touch-action:manipulation;}
+ .modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+ .modal.show{display:flex}
+ .modalCard{width:min(820px,96vw);max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+ .modalHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 14px 8px 14px;border-bottom:1px solid var(--line)}
+ .modalTitle{font-weight:900}
+ .modalSub{color:var(--muted);font-size:12px;margin-top:2px}
+ .modalBody{padding:14px}
+ .miniTitle{font-weight:800;margin:0 0 6px 0}
+ .bul{margin:0 0 0 18px;padding:0}
+ .bul li{margin:6px 0;color:var(--text)}
+ .notice{background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;border-radius:14px;padding:12px 12px;line-height:1.35;box-shadow:0 10px 24px rgba(15,23,42,.06);margin:10px 0 12px;}
+ .notice b{color:#7c2d12}
+ textarea{width:100%;padding:12px 12px;border-radius:14px;border:2px solid var(--line);background:#fff;font-size:15px;outline:none;min-height:120px;line-height:1.35;resize:vertical;}
+ textarea:focus{border-color:#87b3e6;box-shadow:0 0 0 3px rgba(11,95,182,.12);}
+ .label{font-size:12px;color:var(--muted);font-weight:900;margin:10px 0 6px;}
+ /* ALFA_07 – Home refinements */
+ .homeTop{justify-content:flex-start;}
+ .topbar{padding:16px 16px 12px;}
+ .brand{gap:12px;}
+ .brandimg{height:60px;}
+ @media (max-width:420px){
+ .brandimg{height:52px;}
+ }
+ /* Home hero */
+ .homeHero{margin:10px 0 12px; padding:12px 12px; border-radius:14px;
+ background:linear-gradient(180deg,#eff6ff,#ffffff);
+ border:1px solid var(--line);
+ box-shadow:0 10px 22px rgba(15,23,42,.05);
+ }
+ .homeHero .t{font-weight:950; color:#0f172a; font-size:14px; letter-spacing:.2px;}
+ .homeHero .s{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35;}
+ .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+ .chip{font-size:11px; font-weight:900; padding:6px 10px; border-radius:999px;
+ background:#ffffff; border:1px solid var(--line); color:#0f172a;}
+ /* Identification table: reduce font + prevent cut */
+ .r{font-size:12px; padding:10px 12px;}
+ .k{min-width:140px; flex:1 1 48%;} 
+ .v{min-width:140px; flex:1 1 48%; text-align:left;}
+ .inrow{width:100%; max-width:none; text-align:left; font-size:13px;}
+/* ALFA 19 v8: centralizar RESULTADO */
+.statusLine{ text-align:center; }
+.fluxo-info-texto strong { font-weight: 700; }
+
+.fluxo-textarea{
+  width: 100%;
+  border: 1px solid #d0d0d0;
+  background: linear-gradient(180deg, #f8f9fa, #eef1f4);
+  border-radius: 8px;
+  padding: 12px 15px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #2c3e50;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  resize: vertical;
+  min-height: 110px;
+  outline: none;
+}
+.fluxo-textarea:focus{
+  border-color: #9aa7b2;
+}
+
+
+/* --- Assinaturas --- */
+.sigGrid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media (max-width: 980px){.sigGrid{grid-template-columns:1fr;}}
+.sigBox{border:1px solid #e5e7eb;border-radius:14px;padding:10px;}
+.sigTop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.sigLabel{font-weight:700;min-width:170px;}
+.sigCanvas{width:100%;height:180px;border:1px dashed #cbd5e1;border-radius:12px;background:#fff;touch-action:none;}
+.sigActions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;}
+</style>
+<style>
+.fluxo-info-box {
+ border: 1px solid #d0d0d0;
+ background: linear-gradient(180deg, #f8f9fa, #eef1f4);
+ border-radius: 8px;
+ padding: 12px 15px;
+ margin-bottom: 18px;
+ box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.fluxo-info-texto {
+ font-size: 13.5px;
+ line-height: 1.5;
+ text-align: justify;
+ color: #2c3e50;
+}
+</style>
+<style>
+/* Parecer técnico somente na impressão */
+.somente-print{display:none;}
+@media print{
+  @page{ size:A4; margin:6mm; }
+  html,body{ margin:0 !important; padding:0 !important; }
+  .somente-print{display:block !important;}
+
+  /* NÃO forçar nova página: evita “buraco” e folha extra */
+  .pagebreak{break-before:auto !important; page-break-before:auto !important;}
+
+  /* Compactação somente na impressão (para caber em 2 folhas) */
+  .card{ margin:0 0 6px 0 !important; box-shadow:none !important; }
+  .card .body{ padding:8px 10px !important; }
+  .card .head{ padding:6px 10px !important; font-size:12px !important; }
+
+  .blueHead,.secHeader{ padding:6px 10px !important; font-size:12px !important; }
+  .r{ padding:6px 8px !important; font-size:11px !important; }
+  .k,.v{ font-size:11px !important; }
+  textarea,.fluxo-textarea{ min-height:auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+<div class="row homeTop">
+<div class="brand" style="gap:0;">
+<img alt="AXIS • Soluções em Engenharia" class="brandimg" src="./logo_axis.png" />
+</div>
+</div>
+</div>
+<main id="main-content">
+<section id="screen_inicio">
+<div class="card">
+<div class="head">Avaliação</div>
+<div class="body">
+
+<div class="homeHero">
+  <div class="t">Fluxo de verificação e observações</div>
+  <div class="s">
+    Inicie pela verificação das condições ambientais. Em seguida, complete o Pré‑Checklist, Acessórios e Carga para gerar o Relatório final.<br/><br/>
+    <b>Obs:</b> O cálculo de capacidade usa apenas a <b>margem 75%</b> da capacidade no raio (load chart).<br/>
+    <b>FD</b> está mantido no layout, mas <b>não entra no cálculo</b> nesta versão.
+  </div>
+  <div class="chips">
+    <span class="chip">Condições do Ambiente</span><span class="chip">Pré‑Checklist</span><span class="chip">Acessórios</span><span class="chip">Carga</span><span class="chip">Relatório</span>
+  </div>
+</div>
+<div class="table">
+<div class="r"><div class="k">Data</div><div class="v"><input class="inrow" id="id_data" type="text"/></div></div>
+<div class="r"><div class="k">Hora</div><div class="v"><input class="inrow" id="id_hora" type="text"></div></div>
+<div class="r"><div class="k">Avaliação</div><div class="v"><input class="inrow" id="avaliacaoInicioInput" type="text" readonly></div></div>
+<div class="r"><div class="k">Local</div><div class="v"><input class="inrow" id="id_local" type="text"/ placeholder="Ex.: Área A"></div></div>
+<div class="r"><div class="k">Operador</div><div class="v"><input class="inrow" id="id_operador" type="text"/ placeholder="Nome do operador"></div></div>
+<div class="r"><div class="k">Encarregado</div><div class="v"><input class="inrow" id="id_supervisor" type="text" placeholder="Nome do encarregado responsável"></div></div>
+<div class="r"><div class="k">Técnico em Segurança</div><div class="v"><input class="inrow" id="id_tecnico_seg" type="text" placeholder="Nome do técnico em segurança"/></div></div>
+<div class="r"><div class="k">Empresa</div><div class="v"><input class="inrow" id="id_empresa" type="text" placeholder="Nome da empresa"/></div></div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"><button class="btn" id="btnAmbiente">Iniciar verificação das condições ambientais</button></div>
+</div>
+</div>
+</section>
+<section class="screen hide" id="screen_ambiente">
+<div class="wrap">
+<div class="card">
+<div class="head">Condições do Ambiente</div>
+<div class="body">
+<div class="mini" style="margin-bottom:10px;">
+ Marque <b>SIM</b> em todos os itens para liberar o Pré-Checklist. Se houver qualquer <b>NÃO</b>, a operação não deve prosseguir.
+ </div>
+<div class="label">Condições climáticas atuais</div>
+<select id="climaAtual">
+<option selected="" value="">Selecione…</option>
+<option>Sol / Céu claro</option>
+<option>Parcialmente nublado</option>
+<option>Nublado</option>
+<option>Chuva fraca</option>
+<option>Chuva moderada</option>
+<option>Chuva intensa</option>
+<option>Neblina</option>
+<option>Ventos fortes</option>
+</select>
+<div class="label">Observações / Restrições Identificadas</div>
+<textarea id="ambObs" placeholder="Descreva qualquer condição insegura, restrição operacional ou observação relevante para a movimentação da carga."></textarea>
+<div class="secHeader"><span>Verificações obrigatórias</span><span class="pillTag">TRAVA</span></div>
+<div class="qrow"><span>Atividade planejada e liberada</span><button class="pillYN bad" data-eid="plan" type="button">NÃO</button></div>
+<div class="qrow"><span>Líder da frente ciente</span><button class="pillYN bad" data-eid="lider" type="button">NÃO</button></div>
+<div class="qrow"><span>APR/PT válidas e comunicadas</span><button class="pillYN bad" data-eid="aprpt" type="button">NÃO</button></div>
+<div class="qrow"><span>Operador e sinaleiro habilitados</span><button class="pillYN bad" data-eid="hab" type="button">NÃO</button></div>
+<div class="qrow"><span>Capacidade do equipamento compatível com a carga</span><button class="pillYN bad" data-eid="cap" type="button">NÃO</button></div>
+<div class="qrow"><span>Solo adequado para patolamento</span><button class="pillYN bad" data-eid="solo" type="button">NÃO</button></div>
+<div class="qrow"><span>Área suficiente para abertura das patolas</span><button class="pillYN bad" data-eid="patArea" type="button">NÃO</button></div>
+<div class="qrow"><span>Interferências verificadas (valas, redes, taludes)</span><button class="pillYN bad" data-eid="interf" type="button">NÃO</button></div>
+<div class="qrow"><span>Distância segura de redes elétricas</span><button class="pillYN bad" data-eid="rede" type="button">NÃO</button></div>
+<div class="qrow"><span>Espaço disponível para isolamento da área</span><button class="pillYN bad" data-eid="isola" type="button">NÃO</button></div>
+<div class="qrow"><span>Acessórios de içamento inspecionados</span><button class="pillYN bad" data-eid="aces" type="button">NÃO</button></div>
+<div class="qrow"><span>Peso e pontos de içamento confirmados</span><button class="pillYN bad" data-eid="peso" type="button">NÃO</button></div>
+<div class="qrow"><span>Área de giro da lança desobstruída</span><button class="pillYN bad" data-eid="giro" type="button">NÃO</button></div>
+<div class="qrow"><span>Carga possui proteção adequada contra quinas vivas (quebra-quinas aplicado)?</span><button class="pillYN bad" data-eid="clima" type="button">NÃO</button></div>
+<div class="qrow"><span>Comunicação definida entre operador e sinaleiro</span><button class="pillYN bad" data-eid="com" type="button">NÃO</button></div>
+<div class="qrow"><span>EPIs adequados em uso</span><button class="pillYN bad" data-eid="epi" type="button">NÃO</button></div>
+<div style="height:14px;"></div>
+<button class="btn" id="btnAmbienteSalvar">Salvar</button>
+</div>
+</div>
+</div>
+</section>
+<section class="screen hide" id="screen_acessorios">
+<div class="wrap">
+<div class="card">
+<div class="cardTitle">Checklist de Acessórios (Cintas e Manilhas)</div>
+<div class="sub">Verificação visual obrigatória antes do içamento. Qualquer item em <b>NÃO</b> reprova.</div>
+<div class="secHeader" style="margin-top:12px;"><span>Cintas (sling)</span><span class="pillTag">INSPEÇÃO</span></div>
+<div class="list">
+<div class="li"><div class="txt"><b>Identificação/WLL legível</b><div class="mut">Etiqueta com capacidade (WLL), fabricante e tipo.</div></div><span class="pillYN bad" data-aid="c_id">NÃO</span></div>
+<div class="li"><div class="txt"><b>Sem cortes/rasgos/abrasão</b><div class="mut">Sem danos no corpo da cinta e costuras.</div></div><span class="pillYN bad" data-aid="c_dano">NÃO</span></div>
+<div class="li"><div class="txt"><b>Sem dano térmico/químico</b><div class="mut">Sem queimaduras, rigidez anormal ou ataque químico.</div></div><span class="pillYN bad" data-aid="c_quim">NÃO</span></div>
+<div class="li"><div class="txt"><b>Olhais íntegros / proteção de canto</b><div class="mut">Olhais sem dano; protetor de canto quando necessário.</div></div><span class="pillYN bad" data-aid="c_olhal">NÃO</span></div>
+<div class="li"><div class="txt"><b>Configuração/ângulo compatíveis</b><div class="mut">Tipo de amarração e ângulo de trabalho controlado.</div></div><span class="pillYN bad" data-aid="c_ang">NÃO</span></div>
+</div>
+<div class="secHeader" style="margin-top:14px;"><span>Manilhas (shackles)</span><span class="pillTag">INSPEÇÃO</span></div>
+<div class="list">
+<div class="li"><div class="txt"><b>Sem trincas/deformações/corrosão severa</b><div class="mut">Corpo e pino sem dano estrutural.</div></div><span class="pillYN bad" data-aid="m_corpo">NÃO</span></div>
+<div class="li"><div class="txt"><b>Pino correto, rosqueado e travado</b><div class="mut">Pino totalmente assentado, sem folgas anormais.</div></div><span class="pillYN bad" data-aid="m_pino">NÃO</span></div>
+<div class="li"><div class="txt"><b>Identificação/WLL legível</b><div class="mut">Capacidade gravada/identificada.</div></div><span class="pillYN bad" data-aid="m_id">NÃO</span></div>
+<div class="li"><div class="txt"><b>Aplicação correta (sem carga excêntrica)</b><div class="mut">Assentamento adequado no olhal/ponto.</div></div><span class="pillYN bad" data-aid="m_app">NÃO</span></div>
+</div>
+<div class="secHeader" style="margin-top:14px;"><span>Cabos de aço</span><span class="pillTag">INSPEÇÃO</span></div>
+<div class="list">
+ <div class="li"><div class="txt"><b>Identificação/WLL legível</b><div class="mut">Capacidade (WLL), diâmetro e identificação do conjunto.</div></div><span class="pillYN bad" data-aid="w_id">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem arames rompidos acima do limite</b><div class="mut">Verificar trecho de maior solicitação.</div></div><span class="pillYN bad" data-aid="w_arame">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem deformações (amassamento/achatamento)</b><div class="mut">Sem “gaiola”, dobras ou torções.</div></div><span class="pillYN bad" data-aid="w_def">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem corrosão severa / redução de diâmetro</b><div class="mut">Condição superficial e integridade.</div></div><span class="pillYN bad" data-aid="w_cor">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Olhal/soquete e presilhas íntegros</b><div class="mut">Sem folgas, trincas, apertos incorretos.</div></div><span class="pillYN bad" data-aid="w_olhal">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Aplicação correta (ângulo/pontos)</b><div class="mut">Assentamento e ângulo compatíveis com o plano.</div></div><span class="pillYN bad" data-aid="w_app">NÃO</span></div>
+</div>
+<div class="secHeader" style="margin-top:14px;"><span>Correntes</span><span class="pillTag">INSPEÇÃO</span></div>
+<div class="list">
+ <div class="li"><div class="txt"><b>Identificação/WLL legível</b><div class="mut">Classe, WLL e identificação do conjunto.</div></div><span class="pillYN bad" data-aid="k_id">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Elos sem deformações ou alongamento</b><div class="mut">Sem elos “abertos” ou ovalizados.</div></div><span class="pillYN bad" data-aid="k_elo">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem trincas / fissuras</b><div class="mut">Inspeção visual em elos e acessórios.</div></div><span class="pillYN bad" data-aid="k_trinca">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Ganchos com trava funcional</b><div class="mut">Trava fecha e abre corretamente.</div></div><span class="pillYN bad" data-aid="k_gancho">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem soldas ou reparos não autorizados</b><div class="mut">Proibido solda/reparo em corrente.</div></div><span class="pillYN bad" data-aid="k_solda">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Aplicação correta (ângulo/pontos)</b><div class="mut">Assentamento e ângulo compatíveis com o plano.</div></div><span class="pillYN bad" data-aid="k_app">NÃO</span></div>
+</div>
+<div class="secHeader" style="margin-top:14px;"><span>Ganchos</span><span class="pillTag">INSPEÇÃO</span></div>
+<div class="list">
+ <div class="li"><div class="txt"><b>Trava de segurança funcional</b><div class="mut">Trava abre/fecha e retorna à posição.</div></div><span class="pillYN bad" data-aid="g_trava">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem deformações (abertura excessiva)</b><div class="mut">Sem garganta aberta ou corpo deformado.</div></div><span class="pillYN bad" data-aid="g_def">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Sem trincas/entalhes</b><div class="mut">Inspeção visual de trincas e riscos profundos.</div></div><span class="pillYN bad" data-aid="g_trinca">NÃO</span></div>
+ <div class="li"><div class="txt"><b>Identificação/WLL legível (quando aplicável)</b><div class="mut">Marcações e capacidade identificadas.</div></div><span class="pillYN bad" data-aid="g_id">NÃO</span></div>
+</div>
+<div class="note" style="margin-top:12px;">
+<b>Critério:</b> somente <b>salve</b> quando todos os itens estiverem em <b>SIM</b>.
+ </div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+<button class="btn" id="btnFinalizarAcess">Salvar checklist de acessórios</button>
+<button class="btn ghost" id="btnZerarAcess">Zerar</button>
+</div>
+</div>
+</div>
+</section>
+<section class="hide" id="screen_carga">
+<div class="card">
+<div class="head" id="tituloAvaliacao">AVALIAÇÃO 001</div>
+<div class="body">
+<div class="table">
+<div class="r"><div class="k">Tipo de Equipamento</div><div class="v">
+<select class="inrow" id="equipTipo">
+<option value="Guindauto">Guindauto (Munck)</option>
+<option value="Guindaste">Guindaste</option>
+<option value="Escavadeira">Escavadeira</option>
+</select>
+</div></div>
+<div class="r"><div class="k">Peso da Carga <span class="unit">(kg)</span></div><div class="v"><input class="inrow" id="peso" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Raio Estimado <span class="unit">(m)</span></div><div class="v"><input class="inrow" id="raio" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Capacidade no Raio <span class="unit">(kg)</span></div><div class="v"><input class="inrow" id="capRaio" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Capacidade da Cinta <span class="unit">(kg)</span></div><div class="v"><input class="inrow" id="capCinta" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Capacidade da Manilha <span class="unit">(kg)</span></div><div class="v"><input class="inrow" id="capManilha" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Comprimento / Tamanho da Cinta <span class="unit">(m)</span></div><div class="v"><input class="inrow" id="tamCinta" inputmode="decimal" placeholder="DIGITAR"></div></div>
+<div class="r"><div class="k">Pré-checklist (geral) realizado?</div><div class="v"><span class="pillYN bad" id="chkRealizado">NÃO</span></div></div>
+<div class="r"><div class="k">Checklist de acessórios (cinta/manilha) realizado?</div><div class="v"><span class="pillYN bad" id="chkAcessRealizado">NÃO</span></div></div>
+<div class="r" style="align-items:flex-start;">
+<div class="k">Centro de Gravidade</div>
+<div class="v" style="min-width:160px;">
+<div class="cgRow">
+<label><input checked="" name="cg" type="radio"/> Central</label>
+<label><input name="cg" type="radio"/> Des</label>
+</div>
+</div>
+</div>
+</div>
+<div style="height:12px;"></div>
+<div class="subcardHead">ACESSORIOS UTILIZADOS</div>
+<div class="picklist">
+<div class="pick on"><div class="left"><div class="radioDot"></div> Cinta</div><div class="checkMark">✓</div></div>
+<div class="pick on"><div class="left"><div class="radioDot"></div> Manilha</div><div class="checkMark">✓</div></div>
+<div class="pick on"><div class="left"><div class="radioDot"></div> Gancho</div><div class="checkMark">✓</div></div>
+<div class="pick"><div class="left"><div class="radioDot"></div> Cabos de aço</div><div class="checkMark">✓</div></div>
+<div class="pick"><div class="left"><div class="radioDot"></div> Correntes</div><div class="checkMark">✓</div></div>
+</div>
+<div style="height:12px;"></div>
+<div class="subcardHead">Numero de Pernas</div>
+<div class="stepper">
+<button id="minus" type="button">−</button>
+<div class="val" id="pernas"></div>
+<button id="plus" type="button">+</button>
+</div>
+<div style="height:12px;"></div>
+<div class="subcardHead">Tipo de Avaliação</div>
+<select id="tipoAvaliacao">
+  <option value="conjunto" selected>Conjunto (equipamento + acessórios)</option>
+  <option value="equipamento">Somente equipamento</option>
+</select>
+<div style="height:12px;"></div>
+<div class="subcardHead">Tipo de Amarração</div>
+<select id="amarra">
+  <option value="vertical">Vertical</option>
+  <option value="forca">Forca (Enforcamento)</option>
+  <option value="cesto">Cesto (Berço)</option>
+  <option value="cesto45">Cesto 45°</option>
+  <option value="cesto60">Cesto 60°</option>
+</select>
+<div style="height:12px;"></div>
+<div class="subcardHead">Fator Dinâmico</div>
+<select id="fd">
+<option selected="" value="1.0">Level - 1.0</option>
+<option value="1.1">Level - 1.1</option>
+<option value="1.3">Level - 1.3</option>
+<option value="1.5">Level - 1.5</option>
+</select>
+<div style="height:12px;"></div>
+<div class="subcardHead">Isolamento (DMI mínimo)</div>
+<div class="table">
+<div class="r"><div class="k">Altura da lança <span class="unit">(m)</span></div><div class="v"><input class="inrow" id="alturaL" inputmode="decimal"/></div></div>
+<div class="r"><div class="k">Largura da carga <span class="unit">(m)</span></div><div class="v"><input class="inrow" id="larguraC" inputmode="decimal"/></div></div>
+<div class="r"><div class="k">Isolamento aplicado <span class="unit">(m)</span></div><div class="v"><input class="inrow" id="isoAplic" inputmode="decimal"/></div></div>
+<div class="r"><div class="k">DMI mínimo <span class="unit">(m)</span></div><div class="v"><span id="dmiMin">—</span></div></div>
+<div class="r"><div class="k">Margem <span class="unit">(m)</span></div><div class="v"><span id="margemIso">—</span></div></div>
+</div>
+<div class="mini" style="margin-top:8px;">DMI = (Altura da lança + metade da largura da carga) × 1,25</div>
+<div style="height:14px;"></div>
+<button class="btn" id="btnSalvar">Finalizar</button>
+</div>
+</div>
+</section>
+<section class="hide" id="screen_checklist">
+<div class="card">
+<div class="head">Checklist de Segurança</div>
+<div class="body">
+<div class="secHeader"><span>Documentação</span><span class="pillTag">AUTO</span></div>
+<div class="qrow"><span>PT e Plano de Rigging disponível?</span><button class="pillYN bad" data-id="pt" type="button">NÃO</button></div>
+<div class="qrow"><span>Ponto de deposição/montagem da carga definido e sinalizado?</span><button class="pillYN bad" data-id="iso" type="button">NÃO</button></div>
+<div class="qrow"><span>Patolas apoiadas e niveladas?</span><button class="pillYN bad" data-id="pat" type="button">NÃO</button></div>
+<div class="qrow"><span>Patolas totalmente abertas?</span><button class="pillYN bad" data-id="patA" type="button">NÃO</button></div>
+<div class="qrow"><span>Área isolada e compacta?</span><button class="pillYN bad" data-id="area" type="button">NÃO</button></div>
+<div class="qrow"><span>Área isolada contorna?</span><button class="pillYN bad" data-id="cont" type="button">NÃO</button></div>
+<div class="secHeader" style="margin-top:12px;"><span>Comunicação / Sinaleiro</span><span class="pillTag">AUTO</span></div>
+<div class="qrow"><span>Área isolada controlada?</span><button class="pillYN bad" data-id="com" type="button">NÃO</button></div>
+<div class="secHeader" style="margin-top:12px;"><span>Condições Ambientais</span><span class="pillTag">AUTO</span></div>
+<div class="qrow"><span>Condições adequadas?</span><button class="pillYN bad" data-id="amb" type="button">NÃO</button></div>
+<div class="table" style="margin-top:10px;">
+<div class="r"><div class="k">Condições climáticas</div><div class="v"><input class="inrow" id="clima" placeholder="Ex.: céu aberto, vento fraco, sem chuva" type="text"/></div></div>
+</div>
+<div style="margin-top:12px;">
+<button class="btn" id="btnFinalizar">Salvar</button>
+</div>
+</div>
+</div>
+</section>
+<section class="hide" id="screen_relatorio">
+  <div class="card">
+<div  id="printArea">
+<div class="head" id="tituloAvaliacao2">AVALIAÇÃO 001</div>
+<div class="body">
+<div class="table">
+<div class="r"><div class="k">Data:</div><div class="v" id="relData">—</div></div>
+<div class="r"><div class="k">Hora:</div><div class="v" id="relHora">—</div></div>
+<div class="r"><div class="k">Empresa:</div><div class="v" id="relEmpresa">—</div></div>
+<div class="r"><div class="k">Local:</div><div class="v" id="relLocal">—</div></div>
+<div class="r"><div class="k">Operador:</div><div class="v" id="relOper">—</div></div>
+<div class="r"><div class="k">Encarregado:</div><div class="v" id="relSup">—</div></div>
+<div class="r"><div class="k">Técnico em Segurança:</div><div class="v" id="relTecSeg">—</div></div>
+<div class="r"><div class="k">Condições climáticas:</div><div class="v" id="relClima">—</div></div>
+<div class="r"><div class="k">Observações / Restrições:</div><div class="v" id="relObs">—</div></div>
+<div class="r"><div class="k">Tipo de Equipamento:</div><div class="v" id="relEquipTipo">—</div></div>
+</div>
+<div style="height:12px;"></div>
+<div class="blueHead">Dados da Carga</div>
+<div class="table" id="relCarga"></div>
+<div style="height:12px;"></div>
+<div class="blueHead" style="page-break-before: always;">Métricas (75%)</div>
+<div class="table" id="relMet"></div>
+<div style="height:12px;"></div>
+<div class="blueHead">Isolamento (DMI mínimo)</div>
+<div class="table" id="relIso"></div>
+<div style="height:12px;"></div>
+<div class="blueHead">Checklist Realizado</div>
+<div class="table" id="relCheck"></div>
+<!-- <div class="card"  -->
+<div class="blueHead" style="page-break-before: always;">Checklist de Acessórios (Cintas e Manilhas)</div>
+<div class="table" id="relAcess"></div>
+<!-- id="assinaturasCard" style="margin-top:12px;"> -->
+  <div class="head">Assinaturas (visualização antes do PDF)</div>
+  <div class="body">
+    <div class="mini" style="margin-bottom:10px;">Assine nos campos abaixo. As assinaturas ficam salvas neste dispositivo (até você limpar) e entram no PDF gerado.</div>
+
+    <div class="sigGrid">
+
+      <div class="sigBox">
+        <div class="sigTop">
+          <div class="sigLabel">Operador</div>
+          <input class="inrow" id="sig_nome_operador" type="text" placeholder="Nome do operador"/>
+        </div>
+        <canvas class="sigCanvas" id="sig_canvas_operador" width="900" height="260"></canvas>
+        <div class="sigActions" id="sign1">
+          <button class="btnAlt" type="button" id="sig_clear_operador">Limpar</button>
+          <div class="mini">Data/Hora: <span id="sig_dt_operador">—</span></div>
+        </div>
+      </div>
+
+      <div class="sigBox">
+        <div class="sigTop">
+          <div class="sigLabel">Encarregado</div>
+          <input class="inrow" id="sig_nome_encarregado" type="text" placeholder="Nome do encarregado responsável"/>
+        </div>
+        <canvas class="sigCanvas" id="sig_canvas_encarregado" width="900" height="260"></canvas>
+        <div class="sigActions" id="sign2">
+          <button class="btnAlt" type="button" id="sig_clear_encarregado">Limpar</button>
+          <div class="mini">Data/Hora: <span id="sig_dt_encarregado">—</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div style="height:12px;"></div>
+
+
+<div class="statusBox" style="page-break-before: always;">
+<div class="statusLine" id="relStatus" class="statusLine" >RESULTADO: NÃO LIBERADO</div>
+</div>
+
+<!-- Parecer técnico: apenas na impressão (nova página) -->
+<div id="relParecerPrint" class="somente-print">
+  <div class="card" style="box-shadow:none;">
+    <div class="head">Parecer Técnico</div>
+    <div class="body">
+      <div class="mini" id="relMotivo">—</div>
+    </div>
+  </div>
+</div>
+</div>
+<div style="margin-top:12px;">
+<button class="btnAlt" id="btnPrint">Visualizar Impressão</button>
+
+<div style="height:10px;"></div>
+<button class="btn" id="btnPdfFile">Gerar PDF</button>
+<div style="margin-top:10px;"><button class="btn" id="btnNovaAvaliacao" style="background:#0f172a;width:100%;display:block;margin:0 auto;">Nova Avaliação</button></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav aria-label="Navegação" class="nav" role="navigation" id="nav-content">
+<button class="active" id="nav_inicio"><span class="ico">⌂</span>Inicio</button>
+<button id="nav_checklist"><span class="ico">☑</span>Pré-Checklist</button>
+<button id="nav_acessorios"><span class="ico">⛓</span>Acessórios</button>
+<button id="nav_carga"><span class="ico">▦</span>Carga</button>
+<button id="nav_relatorio"><span class="ico">≡</span>Relatório</button>
+</nav>
+</div>
+<script>
+(function(){
+ const $ = (id)=>document.getElementById(id);
+ const escapeHTML = (s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
+ // Estado (persistente na sessão)
+ let checklistDone = false;
+ let acessChecklistDone = false;
+ function parsePt(v){
+ if(v===null || v===undefined) return null;
+ const s = String(v).trim();
+ if(!s) return null;
+ const cleaned = s.replaceAll('.','').replaceAll(',','.');
+ const n = Number(cleaned);
+ return Number.isFinite(n) ? n : null;
+ }
+ function getNum(id){
+ const el = $(id);
+ if(!el) return 0;
+ const raw = (el.value != null) ? String(el.value).trim() : String(el.textContent||'').trim();
+ if(raw === '') return 0;
+ const n = parsePt(raw);
+ return (n == null || Number.isNaN(n)) ? 0 : n;
+ }
+ function fmtInt(v){
+ if(v==null || !Number.isFinite(v)) return '—';
+ const s = Math.round(v).toString();
+ return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+ }
+ function fmtDec(v, dec=2){
+ if(v==null || !Number.isFinite(v)) return '—';
+ return v.toFixed(dec).replace('.', ',');
+ }
+ function calcDmi(altura, largura){
+ if(altura==null || largura==null) return null;
+ // Values must be strictly positive
+ if(altura <= 0 || largura <= 0) return null;
+ return (altura + (largura/2)) * 1.25;
+ }
+ // Navigation
+ const screens = { inicio:$('screen_inicio'), ambiente:$('screen_ambiente'), acessorios:$('screen_acessorios'), carga:$('screen_carga'), checklist:$('screen_checklist'), relatorio:$('screen_relatorio') };
+ const nav = { inicio:$('nav_inicio'), checklist:$('nav_checklist'), acessorios:$('nav_acessorios'), carga:$('nav_carga'), relatorio:$('nav_relatorio') };
+ function show(name){
+ Object.entries(screens).forEach(([k,el])=>el.classList.toggle('hide', k!==name));
+ Object.entries(nav).forEach(([k,el])=>el.classList.toggle('active', k===name));
+ if(name==='carga'){ updateChecklistBadge(); updateIsoPreview(); }
+ if(name==='relatorio') renderRelatorio();
+ }
+ nav.inicio.onclick = ()=>show('inicio');
+ nav.checklist.onclick = ()=>show('checklist');
+ nav.acessorios.onclick = ()=>show('acessorios');
+ nav.carga.onclick = ()=>show('carga');
+ nav.relatorio.onclick = ()=>show('relatorio');
+ $('btnAmbiente') && ($('btnAmbiente').onclick = ()=>show('ambiente'));
+ $('btnAmbienteSalvar') && ($('btnAmbienteSalvar').onclick = ()=>{
+ const fail = firstEnvFail();
+ if(fail){
+ alert('Bloqueado: ajuste para SIM → ' + (envLabel[fail]||fail));
+ return;
+ }
+ const climaVal = ($('climaAtual') && $('climaAtual').value) ? $('climaAtual').value.trim() : '';
+ if(!climaVal){
+ alert('Selecione as condições climáticas atuais para prosseguir.');
+ return;
+ }
+ // Replica a condição climática para o Pré-Checklist
+ if($('clima')) { $('clima').value = climaVal; }
+ show('checklist');
+ });
+ // Stepper
+ let pernas = 2;
+ $('minus').onclick = ()=>{ pernas = Math.max(1, pernas-1); $('pernas').textContent = pernas; };
+ $('plus').onclick = ()=>{ pernas = Math.min(4, pernas+1); $('pernas').textContent = pernas; };
+ // Picks visual only
+ document.querySelectorAll('.pick').forEach(p=>p.addEventListener('click', ()=>p.classList.toggle('on')));
+ // Checklist default all SIM
+ const ck = { pt: false, iso: false, pat: false, patA: false, area: false, cont: false, com: false, amb: false };
+ // Checklist de acessórios (cintas/manilhas) - inicia como NÃO (false)
+ const ckA = { c_id:false, c_dano:false, c_quim:false, c_olhal:false, c_ang:false, m_corpo:false, m_pino:false, m_id:false, m_app:false };
+ const ckALabel = {
+ c_id:'Cinta: identificação/WLL legível',
+ c_dano:'Cinta: sem cortes/rasgos/abrasão/costuras danificadas',
+ c_quim:'Cinta: sem dano térmico/químico',
+ c_olhal:'Cinta: olhais íntegros / proteção de canto',
+ c_ang:'Cinta: configuração/ângulo compatíveis',
+ m_corpo:'Manilha: sem trincas/deformações/corrosão severa',
+ m_pino:'Manilha: pino correto, rosqueado e travado',
+ m_id:'Manilha: identificação/WLL legível',
+ m_app:'Manilha: aplicação correta (sem carga excêntrica)'
+ };
+ // Condições do Ambiente (TRAVA) - inicia como SIM (true)
+ const env = { plan: false, lider: false, aprpt: false, hab: false, cap: false, solo: false, patArea: false, interf: false, rede: false, isola: false, aces: false, peso: false, giro: false, clima: false, com: false, epi: false };
+ const envLabel = {
+ plan:'Atividade planejada e liberada',
+ lider:'Líder da frente ciente',
+ aprpt:'APR/PT válidas e comunicadas',
+ hab:'Operador e sinaleiro habilitados',
+ cap:'Capacidade do equipamento compatível com a carga',
+ solo:'Solo adequado para patolamento',
+ patArea:'Área suficiente para abertura das patolas',
+ interf:'Interferências verificadas (valas, redes, taludes)',
+ rede:'Distância segura de redes elétricas',
+ isola:'Espaço disponível para isolamento da área',
+ aces:'Acessórios de içamento inspecionados',
+ peso:'Peso e pontos de içamento confirmados',
+ giro:'Área de giro da lança desobstruída',
+ clima:'Carga possui proteção adequada contra quinas vivas (quebra-quinas aplicado)?',
+ com:'Comunicação definida entre operador e sinaleiro',
+ epi:'EPIs adequados em uso'
+ };
+ function firstEnvFail(){
+ for(const k of Object.keys(env)){ if(!env[k]) return k; }
+ return null;
+ }
+ function firstCkAFail(){
+ for(const k of Object.keys(ckA)){
+ if(ckA[k] !== true) return ckALabel[k] || k;
+ }
+ return null;
+ }
+ const ckLabel = {
+ pt: 'Ponto de trabalho isolado/sinalizado',
+ iso: 'Isolamento/área de exclusão implementada',
+ pat: 'Patolas acionadas',
+ patA: 'Patolas totalmente abertas/estabilização',
+ area: 'Área nivelada e sem interferências',
+ cont: 'Contrapeso/estabilidade conforme',
+ com: 'Comunicação/sinaleiro definido',
+ amb: 'Condições ambientais adequadas'
+ };
+ function firstCkFail(){
+ for(const k of Object.keys(ck)){
+ if(ck[k] !== true) return ckLabel[k] || k;
+ }
+ return null;
+ }
+ function setPill(pill, ok){
+ pill.classList.toggle('ok', ok);
+ pill.classList.toggle('bad', !ok);
+ pill.textContent = ok ? 'SIM' : 'NÃO';
+ }
+ document.querySelectorAll('.pillYN[data-id]').forEach(p=>{
+ p.addEventListener('click', ()=>{
+ const id = p.dataset.id;
+ ck[id] = !ck[id];
+ setPill(p, ck[id]);
+ });
+ });
+ // Condições do Ambiente: toggles
+ document.querySelectorAll('.pillYN[data-eid]').forEach(p=>{
+ p.addEventListener('click', ()=>{
+ const id = p.dataset.eid;
+ env[id] = !env[id];
+ setPill(p, env[id]);
+ });
+ });
+ // Acessórios: toggles
+ document.querySelectorAll('.pillYN[data-aid]').forEach(p=>{
+ p.addEventListener('click', ()=>{
+ const id = p.dataset.aid;
+ ckA[id] = !ckA[id];
+ setPill(p, ckA[id]);
+ // se alterar, invalida "realizado" até finalizar de novo
+ acessChecklistDone = false;
+ updateChecklistBadge();
+ });
+ });
+ function zerarAcess(){
+ Object.keys(ckA).forEach(k=>ckA[k]=false);
+ document.querySelectorAll('.pillYN[data-aid]').forEach(p=>setPill(p,false));
+ acessChecklistDone = false;
+ updateChecklistBadge();
+ }
+ $('btnZerarAcess') && ($('btnZerarAcess').onclick = ()=>zerarAcess());
+ $('btnFinalizarAcess') && ($('btnFinalizarAcess').onclick = ()=>{
+ const ok = Object.values(ckA).every(v=>v===true);
+ if(!ok){
+ alert('Checklist de acessórios incompleto. Pendência: ' + (firstCkAFail()||'—'));
+ return;
+ }
+ acessChecklistDone = true;
+ updateChecklistBadge();
+ show('carga');
+ });
+ function updateIsoPreview(){
+ const altura = getNum('alturaL');
+ const largura = getNum('larguraC');
+ const isoAp = getNum('isoAplic');
+ const dmi = calcDmi(altura, largura);
+ $('dmiMin').textContent = dmi==null ? '—' : (fmtDec(dmi,2) + ' m');
+ if(dmi!=null && isoAp!=null){
+ const margem = isoAp - dmi;
+ $('margemIso').textContent = fmtDec(margem, 2) + ' m';
+ $('margemIso').style.color = margem >= 0 ? 'var(--ok)' : 'var(--bad)';
+ } else {
+ $('margemIso').textContent = '—';
+ $('margemIso').style.color = 'var(--text)';
+ }
+ }
+ ['alturaL','larguraC','isoAplic'].forEach(id=>{
+ $(id).addEventListener('input', updateIsoPreview);
+ $(id).addEventListener('change', updateIsoPreview);
+ });
+ $('btnSalvar').onclick = ()=>show('relatorio');
+ $('btnFinalizar').onclick = ()=>{ checklistDone = true; updateChecklistBadge(); show('acessorios'); };
+ function updateChecklistBadge(){
+ const el = $('chkRealizado');
+ if(el){
+ el.textContent = checklistDone ? 'SIM' : 'NÃO';
+ el.classList.toggle('ok', checklistDone);
+ el.classList.toggle('bad', !checklistDone);
+ }
+ const elA = $('chkAcessRealizado');
+ if(elA){
+ elA.textContent = acessChecklistDone ? 'SIM' : 'NÃO';
+ elA.classList.toggle('ok', acessChecklistDone);
+ elA.classList.toggle('bad', !acessChecklistDone);
+ }
+ }
+ function toggleChecklistDone(){
+ checklistDone = !checklistDone;
+ updateChecklistBadge();
+ }
+ function calc(){
+  const peso = getNum('peso');
+  const raio = getNum('raio');
+  const capRaio = getNum('capRaio'); // capacidade nominal no raio
+  const fd = parsePt($('fd').value) ?? 1.0; // mantido apenas visual (não entra no cálculo)
+  const equipTipo = ($('equipTipo') && $('equipTipo').value) ? $('equipTipo').value : 'Guindauto';
+
+  // Acessórios / amarração
+  const capCinta = getNum('capCinta'); // WLL nominal informado (kg)
+  const capManilha = getNum('capManilha');
+  const tamCinta = getNum('tamCinta');
+
+  const tipoAvaliacao = ($('tipoAvaliacao') && $('tipoAvaliacao').value) ? $('tipoAvaliacao').value : 'conjunto';
+
+  const amarra = ($('amarra') && $('amarra').value) ? $('amarra').value : 'vertical';
+  let pernas = getNum('pernas'); // stepper (div) -> getNum lê textContent
+  if(pernas==null || pernas<=0) pernas = 1;
+
+  const fatorAmarracao = { vertical:1.0, forca:0.8, cesto:2.0, cesto45:1.4, cesto60:1.0 };
+  const wllNominal = (capCinta!=null && capCinta>0) ? capCinta : null;
+  const wllEfetiva = (wllNominal!=null) ? (wllNominal * (fatorAmarracao[amarra] ?? 1.0) * pernas) : null;
+
+  // Limite 75% do equipamento (útil) - para referência
+  const cap75 = (capRaio!=null && capRaio>0) ? (0.75 * capRaio) : null;
+
+  const cargaEq = (peso!=null && peso>0) ? peso : null;
+
+  // Utilização (critério do primeiro arquivo): comparar com capacidade nominal e travar em 75%
+  const usoEquip = (capRaio!=null && capRaio>0 && cargaEq!=null) ? (cargaEq / capRaio * 100.0) : null;
+  const usoAcess = (tipoAvaliacao!=='equipamento' && wllEfetiva!=null && wllEfetiva>0 && cargaEq!=null) ? (cargaEq / wllEfetiva * 100.0) : null;
+  const usoConjunto = (tipoAvaliacao==='equipamento') ? usoEquip : ((usoEquip!=null && usoAcess!=null) ? Math.max(usoEquip, usoAcess) : (usoEquip!=null ? usoEquip : usoAcess));
+
+  // Fator de segurança equivalente (usando limite 75% do equipamento como referência)
+  const fs = (cap75!=null && cargaEq!=null) ? (cap75 / cargaEq) : null;
+
+  // Isolation
+  const altura = getNum('alturaL');
+  const largura = getNum('larguraC');
+  const isoAp = getNum('isoAplic');
+  const dmi = calcDmi(altura, largura);
+  const margemIso = (dmi!=null && isoAp!=null) ? (isoAp - dmi) : null;
+  const isoOk = (dmi!=null && isoAp!=null) ? (isoAp >= dmi) : null;
+
+  const checklistOk = Object.values(ck).every(v=>v===true);
+  const acessOk = (acessChecklistDone === true);
+
+  const criterioConjuntoOk = (usoConjunto!=null) ? (usoConjunto <= 75.0) : null;
+  const liberado = (criterioConjuntoOk===true) && checklistOk && acessOk && (isoOk===true);
+
+  let motivo = '—';
+  if(peso==null || peso<=0 || capRaio==null || capRaio<=0){
+    motivo = 'Dados incompletos: informar Peso da carga e Capacidade no raio (tabela de carga).';
+  } else if(tipoAvaliacao!=='equipamento' && wllNominal==null){
+    motivo = 'Dados incompletos: informar Capacidade (WLL nominal) da cinta para avaliar o conjunto (acessórios).';
+  } else if(dmi==null || isoAp==null){
+    motivo = 'Dados incompletos: informar Altura da lança, Largura da carga e Isolamento aplicado para cálculo do DMI mínimo.';
+  } else if(isoOk===false){
+    motivo = 'Não conformidade: isolamento aplicado menor que o DMI mínimo calculado.';
+  } else if(!checklistOk){
+    motivo = 'Não conformidade: checklist de segurança reprovado (item: ' + (firstCkFail() || '—') + ').';
+  } else if(acessOk===false){
+    motivo = 'Não conformidade: checklist de acessórios (cintas/manilhas) não realizado ou reprovado.';
+  } else if(criterioConjuntoOk===false){
+    // informar qual limitou
+    const lim = (usoEquip!=null && usoAcess!=null) ? (usoEquip>=usoAcess ? 'equipamento (capacidade no raio)' : 'acessórios (amarração)') : (usoEquip!=null ? 'equipamento (capacidade no raio)' : 'acessórios (amarração)');
+    motivo = 'Não conformidade: conjunto supera 75% (limitante: ' + lim + ').';
+  } else if(liberado){
+    motivo = 'Conforme: conjunto ≤ 75% (equipamento/acessórios), isolamento (DMI mínimo) e checklists atendidos.';
+  }
+
+  return {equipTipo, peso, raio, capRaio, fd, cap75, cargaEq, tipoAvaliacao, altura, largura, isoAp, dmi, margemIso, isoOk,
+          amarra, pernas, wllNominal, wllEfetiva, usoEquip, usoAcess, usoConjunto, fs, checklistOk, liberado, motivo};
+}
+ function addRow(el, k, v){
+ const d=document.createElement('div');
+ d.className='r';
+ d.innerHTML=`<div class="k">${k}</div><div class="v">${v}</div>`;
+ el.appendChild(d);
+ }
+ function renderRelatorio(){
+ const c = calc();
+ $('relData').textContent = $('id_data').value || '—';
+ $('relHora').textContent = $('id_hora').value || '—';
+ $('relEmpresa').textContent = ($('id_empresa') && $('id_empresa').value && $('id_empresa').value.trim()) ? $('id_empresa').value.trim() : '—';
+ $('relLocal').textContent = $('id_local').value || '—';
+ $('relOper').textContent = $('id_operador').value || '—';
+ $('relSup').textContent = $('id_supervisor').value || '—';
+ $('relTecSeg').textContent = ($('id_tecnico_seguranca') && $('id_tecnico_seguranca').value) ? $('id_tecnico_seguranca').value : '—';
+ // Autofill nomes de assinatura (se vazio)
+ if($('sig_nome_operador') && !$('sig_nome_operador').value.trim()) $('sig_nome_operador').value = $('id_operador').value || '';
+ if($('sig_nome_encarregado') && !$('sig_nome_encarregado').value.trim()) $('sig_nome_encarregado').value = ($('id_supervisor')?$('id_supervisor').value:'') || '';
+ // Carimba data/hora nos 3 campos
+ const _dt = _sigNowText();
+ if($('sig_dt_operador')) $('sig_dt_operador').textContent = _dt;
+ if($('sig_dt_encarregado')) $('sig_dt_encarregado').textContent = _dt;
+ $('relClima').textContent = ($('clima') && $('clima').value && $('clima').value.trim()) ? $('clima').value.trim() : '—';
+  const __obs = ($('ambObs') && $('ambObs').value && $('ambObs').value.trim()) ? $('ambObs').value.trim() : '—';
+ $('relObs').innerHTML = (__obs==='—') ? '—' : escapeHTML(__obs).replace(/\n/g,'<br>');
+ $('relEquipTipo').textContent = c.equipTipo || '—';
+ // --- Dados da carga ---
+ const relCarga = $('relCarga'); relCarga.innerHTML='';
+ addRow(relCarga,'Peso da Carga', c.peso==null?'—':`${fmtInt(c.peso)} kg`);
+ addRow(relCarga,'Raio Estimado', c.raio==null?'—':`${fmtDec(c.raio,2)} m`);
+ addRow(relCarga,'Capacidade no Raio (tabela de carga)', c.capRaio==null?'—':`${fmtInt(c.capRaio)} kg`);
+ addRow(relCarga,'Capacidade da Cinta', getNum('capCinta')==null?'—':`${fmtInt(getNum('capCinta'))} kg`);
+ addRow(relCarga,'Capacidade da Manilha', getNum('capManilha')==null?'—':`${fmtInt(getNum('capManilha'))} kg`);
+ addRow(relCarga,'Comprimento / Tamanho da Cinta', getNum('tamCinta')==null?'—':`${fmtDec(getNum('tamCinta'),2)} m`);
+ addRow(relCarga,'Nº de pernas', `${c.pernas||pernas||'—'}`);
+  addRow(relCarga,'Tipo de avaliação', `${(c.tipoAvaliacao==='equipamento')?'Somente equipamento':'Conjunto (equipamento + acessórios)'}`);
+  addRow(relCarga,'Tipo de amarração', `${c.amarra||'—'}`);
+  addRow(relCarga,'WLL nominal (cinta)', (c.wllNominal==null?'—':`${fmtInt(c.wllNominal)} kg`));
+  addRow(relCarga,'WLL efetiva (amarração)', (c.wllEfetiva==null?'—':`${fmtInt(c.wllEfetiva)} kg`));
+ // --- Métricas (75%) ---
+ const relMet = $('relMet'); relMet.innerHTML='';
+ addRow(relMet,'Capacidade Útil (75%) = 0,75 × Capacidade no Raio', c.cap75==null?'—':`${fmtInt(c.cap75)} kg`);
+ addRow(relMet,'% Utilização Equipamento = (Peso / Capacidade no Raio) × 100', c.usoEquip==null?'—':`${fmtDec(c.usoEquip,1)} %`);  addRow(relMet,'% Utilização Acessório = (Peso / WLL efetiva) × 100', c.usoAcess==null?'—':`${fmtDec(c.usoAcess,1)} %`);  addRow(relMet,'% Utilização do Conjunto = max(%Eq, %Acess)', c.usoConjunto==null?'—':`${fmtDec(c.usoConjunto,1)} %`);  addRow(relMet,'Critério do Conjunto (bloqueio > 75%)', (c.usoConjunto==null)?'—':(c.usoConjunto<=75?'CONFORME':'NÃO CONFORME'));  addRow(relMet,'Fator de Segurança (FS) = Capacidade Útil / Peso', c.fs==null?'—':fmtDec(c.fs,2));
+ addRow(relMet,'Resultado 75% (bloqueio > 75%)', (c.fs==null)?'—':(c.fs>=1.0?'CONFORME':'NÃO CONFORME'));
+ // --- Isolamento (DMI mínimo) ---
+ const relIso = $('relIso'); relIso.innerHTML='';
+ addRow(relIso,'Altura da lança', c.altura==null?'—':`${fmtDec(c.altura,2)} m`);
+ addRow(relIso,'Largura da carga', c.largura==null?'—':`${fmtDec(c.largura,2)} m`);
+ addRow(relIso,'DMI mínimo = (Altura + Largura/2) × 1,25', c.dmi==null?'—':`${fmtDec(c.dmi,2)} m`);
+ addRow(relIso,'Isolamento aplicado', c.isoAp==null?'—':`${fmtDec(c.isoAp,2)} m`);
+ addRow(relIso,'Margem = Isolamento aplicado − DMI mínimo', c.margemIso==null?'—':`${fmtDec(c.margemIso,2)} m`);
+ addRow(relIso,'Resultado DMI', (c.isoOk==null)?'—':(c.isoOk ? 'CONFORME' : 'NÃO CONFORME'));
+ // --- Checklist geral ---
+ const relCheck = $('relCheck'); relCheck.innerHTML='';
+ const map = [
+ ['PT e Plano de Rigging disponível', ck.pt],
+ ['Ponto de deposição/montagem da carga definido e sinalizado?', ck.iso],
+ ['Patolas apoiadas e niveladas', ck.pat],
+ ['Patolas totalmente abertas', ck.patA],
+ ['Área isolada e compacta', ck.area],
+ ['Área isolada contorna', ck.cont],
+ ['Área isolada controlada', ck.com],
+ ['Condições adequadas', ck.amb],
+ ['Pré-checklist salvo', (checklistDone===true)],
+ ];
+ map.forEach(([k,ok])=> addRow(relCheck, k, ok ? `<span style="color:var(--ok);font-weight:1000">OK</span>` : `<span style="color:var(--bad);font-weight:1000">NÃO OK</span>`));
+ // --- Checklist de acessórios detalhado ---
+ const relAcess = $('relAcess'); relAcess.innerHTML='';
+ const mapA = [
+ ['Cinta: identificação/WLL legível', ckA.c_id],
+ ['Cinta: sem cortes/rasgos/abrasão/costuras danificadas', ckA.c_dano],
+ ['Cinta: sem dano térmico/químico', ckA.c_quim],
+ ['Cinta: olhais íntegros / proteção de canto', ckA.c_olhal],
+ ['Cinta: configuração/ângulo compatíveis', ckA.c_ang],
+ ['Manilha: sem trincas/deformações/corrosão severa', ckA.m_corpo],
+ ['Manilha: pino correto, rosqueado e travado', ckA.m_pino],
+ ['Manilha: identificação/WLL legível', ckA.m_id],
+ ['Manilha: aplicação correta (sem carga excêntrica)', ckA.m_app],
+ ['Checklist de acessórios salvo', (acessChecklistDone===true)],
+ ];
+ mapA.forEach(([k,ok])=> addRow(relAcess, k, ok ? `<span style="color:var(--ok);font-weight:1000">OK</span>` : `<span style="color:var(--bad);font-weight:1000">NÃO OK</span>`));
+ // --- Parecer (robusto / auditoria) ---
+ const relStatus = $('relStatus');
+ const relMotivo = $('relMotivo');
+ const __mot = (c && c.motivo) ? String(c.motivo).trim() : '';
+ const __just = (__mot && __mot!=='—') ? escapeHTML(__mot).replace(/\n+/g,'<br>') : '—';
+ const __valid = 'Este parecer é válido exclusivamente para as condições descritas neste relatório, devendo ser reavaliado em caso de alteração nos parâmetros operacionais, ambiente ou configuração da carga.';
+ if(c.liberado){
+   relStatus.textContent = 'RESULTADO: LIBERADO';
+   relStatus.classList.add('ok');
+   relMotivo.innerHTML =
+     `<div style="font-weight:1000;margin-bottom:2px;">PARECER TÉCNICO – OPERAÇÃO LIBERADA</div>
+      <div class="mini" style="color:var(--text);text-align:justify;text-justify:inter-word;hyphens:auto;">
+        Após análise técnica detalhada, contemplando verificação das condições ambientais, validação do checklist operacional, conferência dos acessórios utilizados, compatibilidade entre carga, raio de operação e capacidade nominal do equipamento, bem como aplicação da margem de segurança adotada para a operação, conclui-se que a atividade atende aos critérios técnicos e requisitos mínimos de segurança estabelecidos.<br>
+        Não foram identificadas restrições críticas que impeçam a execução da movimentação de carga, estando a operação formalmente liberada sob as condições avaliadas neste relatório.
+      </div>
+      <div class="mini" style="margin-top:0px;"><b>Validade:</b> ${escapeHTML(__valid)}</div>
+      <div class="mini" style="margin-top:0px;"><b>Justificativa técnica:</b> ${__just}</div>`;
+ } else {
+   relStatus.textContent = 'RESULTADO: NÃO LIBERADO';
+   relStatus.classList.remove('ok');
+  //  <div class="mini" style="color:var(--text);text-align:justify;text-justify:inter-word;hyphens:auto;">
+   relMotivo.innerHTML =
+     `<div style="font-weight:1000;margin-bottom:2px;">PARECER TÉCNICO – OPERAÇÃO NÃO LIBERADA</div>
+      <div class="mini" style="color:var(--text);text-align:justify;hyphens:auto;">
+        Após análise técnica das condições operacionais, foram identificadas não conformidades e/ou restrições que comprometem os critérios mínimos de segurança exigidos para a movimentação de carga.<br>
+        As inconsistências verificadas envolvem aspectos relacionados às condições ambientais, checklist operacional, parâmetros técnicos da carga e/ou acessórios utilizados, impossibilitando a liberação da atividade até que as pendências apontadas sejam devidamente corrigidas e reavaliadas.
+      </div>
+      <div class="mini" style="margin-top:0px;"><b>Validade:</b> ${escapeHTML(__valid)}</div>
+      <div class="mini" style="margin-top:0px;"><b>Justificativa técnica:</b> ${__just}</div>`;
+ }
+ }
+ // --- Minimal PDF generator (text-only, offline) ---
+ function pdfEscape(s){
+ return String(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+ }
+ function buildSimplePdf(lines){
+ // A4 portrait: 595x842 points
+ const pageW = 595, pageH = 842;
+ const marginL = 48, startY = 790;
+ const fontSize = 12;
+ const leading = 16;
+ let content = "BT\n/F1 " + fontSize + " Tf\n" + marginL + " " + startY + " Td\n";
+ for(let i=0;i<lines.length;i++){
+ const t = pdfEscape(lines[i]);
+ content += "(" + t + ") Tj\n";
+ if(i !== lines.length-1) content += "0 -" + leading + " Td\n";
+ }
+ content += "ET\n";
+ const contentBytes = new TextEncoder().encode(content);
+ const objects = [];
+ // 1 catalog
+ objects.push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+ // 2 pages
+ objects.push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+ // 3 page
+ objects.push("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pageW + " " + pageH + "] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
+ // 4 font
+ objects.push("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
+ // 5 content stream
+ objects.push("5 0 obj\n<< /Length " + contentBytes.length + " >>\nstream\n" + content + "endstream\nendobj\n");
+ let pdf = "%PDF-1.4\n";
+ const offsets = [0]; // xref requires obj 0
+ for(const obj of objects){
+ offsets.push(pdf.length);
+ pdf += obj;
+ }
+ const xrefPos = pdf.length;
+ pdf += "xref\n0 " + (objects.length+1) + "\n";
+ pdf += "0000000000 65535 f \n";
+ for(let i=1;i<offsets.length;i++){
+ const off = String(offsets[i]).padStart(10,'0');
+ pdf += off + " 00000 n \n";
+ }
+ pdf += "trailer\n<< /Size " + (objects.length+1) + " /Root 1 0 R >>\nstartxref\n" + xrefPos + "\n%%EOF";
+ return new TextEncoder().encode(pdf);
+ }
+ function downloadPdf(filename, lines){
+ const bytes = buildSimplePdf(lines);
+ const blob = new Blob([bytes], {type:"application/pdf"});
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = filename;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url), 2000);
+ }
+ function linesFromReport(){
+ const c = calc();
+ const os = "OS: 008";
+ const clima = ($('clima') && $('clima').value && $('clima').value.trim()) ? $('clima').value.trim() : "—";
+ const yn = (v)=> (v ? "OK" : "NÃO OK");
+ const lines = [
+ "AXIS - Relatório de Içamento (" + os + ")",
+ "",
+ "Data: " + ($('id_data').value || "—"),
+ "Local: " + ($('id_local').value || "—"),
+ "Operador: " + ($('id_operador').value || "—"),
+ "Encarregado: " + ($('id_supervisor').value || "—"),
+ "Condições climáticas: " + clima,
+ "Tipo de equipamento: " + (c.equipTipo || "—"),
+ "",
+ "DADOS DA CARGA",
+ "Peso da carga: " + (c.peso==null?"—":(fmtInt(c.peso)+" kg")),
+ "Raio estimado: " + (c.raio==null?"—":(fmtDec(c.raio,2)+" m")),
+ "Capacidade no raio (load chart): " + (c.capRaio==null?"—":(fmtInt(c.capRaio)+" kg")),
+ "Capacidade da cinta: " + (getNum('capCinta')==null?"—":(fmtInt(getNum('capCinta'))+" kg")),
+ "Capacidade da manilha: " + (getNum('capManilha')==null?"—":(fmtInt(getNum('capManilha'))+" kg")),
+ "Comprimento da cinta: " + (getNum('tamCinta')==null?"—":(fmtDec(getNum('tamCinta'),2)+" m")),
+ "Nº de pernas: " + String(pernas),
+ "",
+ "MÉTRICAS (75%)",
+ "Capacidade útil (75%): " + (c.cap75==null?"—":(fmtInt(c.cap75)+" kg")),
+ "% Utilização Equipamento: " + (c.usoEquip==null?"—":(fmtDec(c.usoEquip,1)+" %")),
+      "% Utilização Acessório: " + (c.usoAcess==null?"—":(fmtDec(c.usoAcess,1)+" %")),
+      "% Utilização Conjunto: " + (c.usoConjunto==null?"—":(fmtDec(c.usoConjunto,1)+" %")),
+ "FS (cap75/peso): " + (c.fs==null?"—":fmtDec(c.fs,2)),
+ "Critério Conjunto (≤75%): " + ((c.usoConjunto==null) ? "—" : (c.usoConjunto<=75 ? "CONFORME" : "NÃO CONFORME")),
+ "",
+ "ISOLAMENTO (DMI)",
+ "Altura da lança: " + (c.altura==null?"—":(fmtDec(c.altura,2)+" m")),
+ "Largura da carga: " + (c.largura==null?"—":(fmtDec(c.largura,2)+" m")),
+ "DMI mínimo: " + (c.dmi==null?"—":(fmtDec(c.dmi,2)+" m")),
+ "Isolamento aplicado: " + (c.isoAp==null?"—":(fmtDec(c.isoAp,2)+" m")),
+ "Margem: " + (c.margemIso==null?"—":(fmtDec(c.margemIso,2)+" m")),
+ "Resultado DMI: " + ((c.isoOk==null) ? "—" : (c.isoOk ? "CONFORME" : "NÃO CONFORME")),
+ "",
+ "CHECKLIST GERAL",
+ "PT e Plano de Rigging: " + yn(ck.pt),
+ "Ponto de deposição/montagem da carga definido e sinalizado?: " + yn(ck.iso),
+ "Patolas apoiadas e niveladas: " + yn(ck.pat),
+ "Patolas totalmente abertas: " + yn(ck.patA),
+ "Área isolada e compacta: " + yn(ck.area),
+ "Área isolada contorna: " + yn(ck.cont),
+ "Área isolada controlada: " + yn(ck.com),
+ "Condições adequadas: " + yn(ck.amb),
+ "Pré-checklist salvo: " + yn(checklistDone===true),
+ "",
+ "CHECKLIST DE ACESSÓRIOS",
+ "Cinta: identificação/WLL: " + yn(ckA.c_id),
+ "Cinta: sem danos: " + yn(ckA.c_dano),
+ "Cinta: sem dano térmico/químico: " + yn(ckA.c_quim),
+ "Cinta: olhais/proteção: " + yn(ckA.c_olhal),
+ "Cinta: ângulo/configuração: " + yn(ckA.c_ang),
+ "Manilha: corpo sem danos: " + yn(ckA.m_corpo),
+ "Manilha: pino correto/travado: " + yn(ckA.m_pino),
+ "Manilha: identificação/WLL: " + yn(ckA.m_id),
+ "Manilha: aplicação correta: " + yn(ckA.m_app),
+ "Checklist acessórios salvo: " + yn(acessChecklistDone===true),
+ "",
+ "PARECER TÉCNICO",
+ (c.liberado ? "LIBERADO" : "REPROVADO"),
+ "Motivo: " + c.motivo
+ ];
+ return lines;
+ }
+
+const buttonGeneratePdf = document.getElementById("btnPdfFile")
+buttonGeneratePdf.addEventListener("click", ()=> {
+  gerarPDFArquivo();
+})
+ // PDF fiel ao layout: usa a mesma visualização de impressão (Salvar como PDF)
+//  $('btnPdfFile').onclick = ()=>{ 
+//   console.log("test")
+//   gerarPDFArquivo(); };
+ 
+async function gerarPDFArquivo(){
+  // Baixa automaticamente o PDF do RELATÓRIO VISUALIZADO (sem mudar layout/fluxo).
+  // Requer internet para carregar a biblioteca html2pdf. Se indisponível, cai em impressão (Salvar como PDF).
+  try{ renderRelatorio(); }catch(e){}
+
+
+  if (typeof html2pdf === 'undefined'){
+    console.log("typeof html2pdf: ", typeof html2pdf)
+    window.print();
+    return;
+  }
+  
+  // const area = document.getElementById('printArea');
+  // const area = document.createElement("div")
+  const area = document.getElementById("printArea")
+// document.getElementById("sig_clear_encarregado").style.display = "none"
+
+
+  if(!area){
+    console.log("!area")
+    window.print();
+    return;
+  }
+
+  // Anexa o parecer técnico como última página somente para o PDF (clone temporário)
+  const parecer = document.getElementById('relParecerPrint');
+  let appended = null;
+  if(parecer){
+    appended = parecer.cloneNode(true);
+    appended.style.display = 'block';
+    // appended.style.pageBreakBefore = 'always';
+    area.appendChild(appended);
+  }
+
+  const prevScrollY = window.scrollY || 0;
+  try{ window.scrollTo(0,0); }catch(e){}
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+  // Nome do arquivo
+  const safe = (s)=>String(s||'').replace(/[\/\:*?\"<>|]+/g,'-').trim();
+  // const dataTxt = safe(document.getElementById('relData')?.textContent) || 'Relatorio';
+  const titulo = safe(document.getElementById('tituloAvaliacao')?.textContent) || 'Avaliacao';
+  // const local = safe(document.getElementById('relLocal')?.textContent) || '';
+  const filename = `Relatório - ${titulo}.pdf`;
+  // const filename = [titulo, dataTxt, local].filter(Boolean).join(' - ') + '.pdf';
+
+  const opt = {
+    margin: 5,
+    filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  };
+
+  document.getElementById("sign1").style.display = "none"
+  document.getElementById("sign2").style.display = "none"
+  try{
+    await html2pdf().set(opt).from(area).save();
+  }catch(e){
+    window.print();
+  }finally{
+    document.getElementById("sign1").style.display = "flex"
+  document.getElementById("sign2").style.display = "flex"
+    try{ if(appended) appended.remove(); }catch(e){}
+    try{ window.scrollTo(0, prevScrollY); }catch(e){}
+  }
+}
+
+// async function gerarPDFArquivo(){
+//   // Baixa automaticamente o PDF do RELATÓRIO VISUALIZADO (sem mudar layout/fluxo).
+//   // Requer internet para carregar a biblioteca html2pdf. Se indisponível, cai em impressão (Salvar como PDF).
+//   try{ renderRelatorio(); }catch(e){}
+//   try{ initAssinaturas(); }catch(e){}
+//   try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
+//   try{ swapSigToImg(true); }catch(e){}
+//   try{ swapSigNamesToText(true); }catch(e){}
+
+//   if (typeof html2pdf === 'undefined'){
+//     window.print();
+//     return;
+//   }
+
+//   const area = document.getElementById('printArea');
+//   if(!area){
+//     window.print();
+//     return;
+//   }
+
+//   // Anexa o parecer técnico como última página somente para o PDF (clone temporário)
+//   const parecer = document.getElementById('relParecerPrint');
+//   let appended = null;
+//   if(parecer){
+//     appended = parecer.cloneNode(true);
+//     appended.style.display = 'block';
+//     appended.style.pageBreakBefore = 'always';
+//     area.appendChild(appended);
+//   }
+
+//   const prevScrollY = window.scrollY || 0;
+//   try{ window.scrollTo(0,0); }catch(e){}
+//   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
+//   // Nome do arquivo
+//   const safe = (s)=>String(s||'').replace(/[\/\:*?\"<>|]+/g,'-').trim();
+//   const dataTxt = safe(document.getElementById('relData')?.textContent) || 'Relatorio';
+//   const titulo = safe(document.getElementById('tituloAvaliacao')?.textContent) || 'Avaliacao';
+//   const local = safe(document.getElementById('relLocal')?.textContent) || '';
+//   const filename = [titulo, dataTxt, local].filter(Boolean).join(' - ') + '.pdf';
+
+//   const opt = {
+//     margin: 5,
+//     filename,
+//     image: { type: 'jpeg', quality: 0.98 },
+//     html2canvas: {
+//       scale: 2,
+//       useCORS: true,
+//       backgroundColor: '#ffffff',
+//       scrollX: 0,
+//       scrollY: 0
+//     },
+//     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+//   };
+
+//   try{
+//     await html2pdf().set(opt).from(area).save();
+//   }catch(e){
+//     window.print();
+//   }finally{
+//     try{ if(appended) appended.remove(); }catch(e){}
+//     try{ swapSigToImg(false); }catch(e){}
+//     try{ swapSigNamesToText(false); }catch(e){}
+//     try{ window.scrollTo(0, prevScrollY); }catch(e){}
+//   }
+// }
+
+// $('btnPrint').onclick = ()=>{
+//  renderRelatorio();
+//  try{ initAssinaturas(); }catch(e){}
+//  try{ setValueAttrs(document.getElementById('printArea')); }catch(e){}
+//  try{ swapSigToImg(true); }catch(e){}
+//   try{ swapSigNamesToText(true); }catch(e){}
+//  window.print();
+//  setTimeout(()=>{ try{ swapSigToImg(false); }catch(e){}
+//     try{ swapSigNamesToText(false); }catch(e){} }, 1200);
+//  };
+})();
+</script>
+<!-- Modal: Checklist de Acessórios (Cintas/Manilhas) -->
+<div aria-hidden="true" class="modal" id="modalAcessorios">
+<div class="modalCard">
+<div class="modalHead">
+<div>
+<div class="modalTitle">Checklist — Cintas e Manilhas (Inspeção Visual)</div>
+<div class="modalSub">Guia rápido para verificação antes do içamento.</div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn ghost" id="btnFecharModalAcess">Fechar</button><button class="btn" id="btnConfirmarAcess">Marcar como realizado</button></div>
+</div>
+<div class="modalBody">
+<div class="miniTitle">Cintas (sling)</div>
+<ul class="bul">
+<li>Identificação/etiqueta legível: capacidade (WLL), fabricante, tipo, comprimento.</li>
+<li>Sem cortes, rasgos, desgaste por abrasão, fibras soltas, costuras danificadas.</li>
+<li>Sem deformação térmica, queimaduras, ataque químico, rigidez anormal.</li>
+<li>Olhais (se aplicável) íntegros; protetores de canto utilizados quando necessário.</li>
+<li>Configuração compatível (cesto, vertical, enforcamento) e ângulo de trabalho controlado.</li>
+</ul>
+<div class="miniTitle" style="margin-top:10px;">Manilhas (shackles)</div>
+<ul class="bul">
+<li>Sem trincas, empenos, deformações, corrosão severa, roscas danificadas.</li>
+<li>Pino correto, totalmente rosqueado e travado; compatibilidade dimensional.</li>
+<li>Identificação/WLL legível; uso sem carregamento excêntrico.</li>
+<li>Sem folgas anormais; assentamento correto no olhal/ponto de ancoragem.</li>
+</ul>
+<div class="note" style="margin-top:10px;">
+<b>Atenção:</b> Itens com qualquer dano ou identificação ilegível devem ser <b>reprovados</b> e segregados.
+ </div>
+</div>
+</div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+const name = params.get("name");
+
+console.log(name); // "thiago"
+if(!name){
+  const mainContent = document.getElementById("main-content")
+  mainContent.textContent = ""
+  mainContent.style.marginTop = "150px"
+  mainContent.style.display = "flex"
+  mainContent.style.flexDirection = "column"
+  mainContent.style.gap = "40px"
+  mainContent.style.textAlign = "center"
+  mainContent.style.alignItems = "center"
+  mainContent.style.justifyContent = "center"
+  const p = document.createElement("p")
+  p.textContent = "Você não tem acesso a essa página"
+  p.style.fontSize = "20px"
+  document.getElementById("nav-content").textContent = ""
+
+  const login = document.createElement("button")
+  login.textContent = "Ir para a tela de login"
+  login.style.color = "white"
+  login.style.backgroundColor = "var(--blue)"
+  login.style.border = "1px solid gray"
+  login.style.padding = "5px 10px"
+  login.style.borderRadius = "5px"
+  login.style.cursor = "pointer"
+  login.style.fontSize = "15px"
+
+  login.addEventListener("click", () => {
+    window.location.href = "index.html";
+  })
+  mainContent.appendChild(p)
+  mainContent.appendChild(login)
+}
+const url = new URL(window.location);
+url.searchParams.delete("name");
+window.history.replaceState({}, document.title, url);
+(function(){
+ // Gera ID técnico: YYMMDDHHMMSS
+ function gerarIdTecnico(){
+ const a = new Date();
+ const yy = String(a.getFullYear()).slice(-2);
+ const MM = String(a.getMonth()+1).padStart(2,'0');
+ const dd = String(a.getDate()).padStart(2,'0');
+ const hh = String(a.getHours()).padStart(2,'0');
+ const mm = String(a.getMinutes()).padStart(2,'0');
+ const ss = String(a.getSeconds()).padStart(2,'0');
+ return `${yy}${MM}${dd}${hh}${mm}${ss}`;
+ }
+ let idAvaliacaoAtual = null;
+ let dataHoraEmissao = null;
+ function atualizarDataHoraTempoReal(){
+ const agora = new Date();
+ const dia = String(agora.getDate()).padStart(2,'0');
+ const mes = String(agora.getMonth()+1).padStart(2,'0');
+ const ano = agora.getFullYear();
+ const hora = String(agora.getHours()).padStart(2,'0');
+ const minuto = String(agora.getMinutes()).padStart(2,'0');
+ const segundo = String(agora.getSeconds()).padStart(2,'0');
+ const campoData = document.getElementById('id_data');
+ const campoHora = document.getElementById('id_hora');
+ if(campoData && campoData.dataset.autofill==='1') campoData.value = `${dia}/${mes}/${ano}`;
+ if(campoHora && campoHora.dataset.autofill==='1') campoHora.value = `${hora}:${minuto}:${segundo}`;
+ }
+ function aplicarId(){
+ const inp = document.getElementById('avaliacaoInicioInput');
+ if(inp) inp.value = idAvaliacaoAtual || '';
+ const titulo = document.getElementById('tituloAvaliacao');
+ if(titulo) titulo.innerText = idAvaliacaoAtual ? ('AVALIAÇÃO ' + idAvaliacaoAtual) : 'AVALIAÇÃO';
+ }
+ function congelarDataHoraNoRelatorio(){
+ dataHoraEmissao = {
+ data: document.getElementById('id_data')?.value || '—',
+ hora: document.getElementById('id_hora')?.value || '—'
+ };
+ const relData = document.getElementById('relData');
+ const relHora = document.getElementById('relHora');
+ if(relData) relData.innerText = dataHoraEmissao.data;
+ if(relHora) relHora.innerText = dataHoraEmissao.hora;
+ }
+ function novaAvaliacao(){
+ // Gera novo ID e volta ao início (mantendo relógio rodando)
+ idAvaliacaoAtual = gerarIdTecnico();
+ aplicarId();
+ // Navegação robusta: tenta show('inicio'), senão clica no botão de navegação do início
+ try{
+ if(typeof show === 'function'){ show('inicio'); return; }
+ }catch(e){}
+ const navBtn = document.getElementById('nav_inicio');
+ if(navBtn){ navBtn.click(); return; }
+ // Fallback final: força exibição da tela início
+ const s = document.getElementById('screen_inicio');
+ if(s){
+ document.querySelectorAll('section.screen').forEach(sec=>sec.classList.add('hide'));
+ s.classList.remove('hide');
+ }
+ }
+ window.addEventListener('DOMContentLoaded', function(){
+ // Inicializa ID ao abrir o app
+ idAvaliacaoAtual = gerarIdTecnico();
+ const titulos = document.getElementById('tituloAvaliacao');
+ const titulos2 = document.getElementById('tituloAvaliacao2');
+ if(titulos) titulos.innerText = idAvaliacaoAtual ? ('AVALIAÇÃO ' + idAvaliacaoAtual) : 'AVALIAÇÃO';
+ if(titulos2) titulos2.innerText = idAvaliacaoAtual ? ('AVALIAÇÃO ' + idAvaliacaoAtual) : 'AVALIAÇÃO';
+ aplicarId();
+ // Data/hora em tempo real no início
+ atualizarDataHoraTempoReal();
+ setInterval(atualizarDataHoraTempoReal, 1000);
+ // Assinaturas
+ try{ initAssinaturas(); }catch(e){}
+ // Sincronizar nomes (Início -> Assinaturas/Relatório)
+ ['id_operador','id_supervisor','id_tecnico_seg'].forEach(_id=>{
+   const el = document.getElementById(_id);
+   if(el){
+     el.addEventListener('input', ()=>{ try{ atualizarRelatorio(); }catch(e){} });
+     el.addEventListener('change', ()=>{ try{ atualizarRelatorio(); }catch(e){} });
+   }
+ });
+ try{ atualizarRelatorio(); }catch(e){}
+ // Congelar data/hora quando salvar/finalizar (se existir botão)
+ const btnFinalizar = document.getElementById('btnFinalizar');
+ if(btnFinalizar){
+ btnFinalizar.addEventListener('click', function(){
+ congelarDataHoraNoRelatorio();
+ }, true);
+ }
+ // Nova Avaliação: último item do relatório
+ const btnNova = document.getElementById('btnNovaAvaliacao');
+ if(btnNova){
+ btnNova.addEventListener('click', function(ev){
+ ev.preventDefault();
+ ev.stopPropagation();
+
+document.getElementById("sig_clear_operador").click()
+document.getElementById("sig_clear_encarregado").click()
+
+ novaAvaliacao();
+ }, true);
+ }
+ });
+})();
+</script>
+
+<script>
+(function(){
+  const KEY = "fluxoTextoEditavel_v1";
+  function init(){
+    const el = document.getElementById("fluxoTextoEditavel");
+    if(!el) return;
+    try{
+      const saved = sessionStorage.getItem(KEY);
+      if(saved && saved.trim().length>0){
+        el.value = saved;
+      }
+    }catch(e){}
+    el.addEventListener("input", function(){
+      try{ sessionStorage.setItem(KEY, el.value); }catch(e){}
+    });
+  }
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  function buildPrintHTML(){
+    const src = $('printArea');
+    if(!src) return null;
+
+    const clone = src.cloneNode(true);
+
+    // Remover botões/controles que eventualmente estejam dentro do printArea
+    clone.querySelectorAll('button, .nav, .topbar').forEach(el=>el.remove());
+
+    // Garante que a página de parecer (somente-print) apareça na impressão/PDF
+    clone.querySelectorAll('.somente-print').forEach(el=>{
+      el.style.display = 'block';
+    });
+
+    // Ajuste fino: remover espaços vazios que empurram páginas
+    clone.querySelectorAll('div[style*="height:12px"]').forEach(el=>{
+      el.style.height = '6px';
+    });
+
+    // Assinaturas: canvas não serializa conteúdo no HTML do iframe.
+// Converte os canvas de assinatura em <img> com DataURL antes de gerar o HTML de impressão/PDF.
+    const sigMap = [
+      {id:'sig_canvas_operador', key:'sig_operador_v1'},
+      {id:'sig_canvas_encarregado', key:'sig_encarregado_v1'}
+    ];
+    sigMap.forEach(s=>{
+      const orig = document.getElementById(s.id);
+      const cv = clone.querySelector('#'+s.id);
+      if(!cv) return;
+      let data = null;
+      try{ data = localStorage.getItem(s.key); }catch(e){}
+      try{ if(!data && orig && orig.toDataURL) data = orig.toDataURL('image/png'); }catch(e){}
+      if(!data) return;
+      const img = document.createElement('img');
+      img.src = data;
+      img.style.width = '100%';
+      img.style.height = '180px';
+      img.style.objectFit = 'contain';
+      img.style.border = '1px dashed #cbd5e1';
+      img.style.borderRadius = '12px';
+      img.style.background = '#fff';
+      cv.replaceWith(img);
+    });
+
+    // Converter nomes (inputs) em texto para garantir captura no iframe/PDF
+    const namePairs = [
+      {inp:'sig_nome_operador', label:'Operador'},
+      {inp:'sig_nome_encarregado', label:'Encarregado'}
+    ];
+    namePairs.forEach(p=>{
+      const inp = clone.querySelector('#'+p.inp);
+      if(!inp) return;
+      const div = document.createElement('div');
+      div.style.marginTop='6px';
+      div.style.fontWeight='800';
+      div.style.fontSize='13px';
+      div.textContent = (inp.value || inp.getAttribute('value') || '—');
+      inp.replaceWith(div);
+    });
+
+    return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relatório • AXIS</title>
+<style>
+  /* A4 + margens compactas para fechar em 2 páginas */
+  @page { size: A4; margin: 6mm; }
+
+  html, body { margin:0; padding:0; background:#fff; color:#0f172a; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+
+  /* Compactação apenas na impressão */
+  .card{ border:0; box-shadow:none; margin:0; }
+  .head{ padding:6px 10px; font-weight:900; font-size:12px; border-bottom:1px solid #ddd; background:#fff; }
+  .body{ padding:8px 10px; }
+  .table{ border:1px solid #ddd; border-radius:10px; overflow:hidden; }
+  .r{ display:flex; justify-content:space-between; gap:10px; padding:6px 10px; border-bottom:1px solid #eee; font-size:11px; background:#fff; flex-wrap:wrap; align-items:flex-start; }
+  .r:last-child{ border-bottom:0; }
+  .k{ font-weight:900; min-width:140px; flex:1 1 48%; }
+  .v{ font-weight:700; min-width:140px; flex:1 1 48%; text-align:left; word-break:break-word; }
+  .blueHead, .secHeader{
+    padding:6px 10px;
+    font-weight:900;
+    font-size:12px;
+    border-radius:10px;
+    margin:8px 0 6px;
+    background:#0b5fb6;
+    color:#fff;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  .statusBox{ margin-top:8px; padding:8px 10px; border:1px solid #ddd; border-radius:10px; background:#fff; }
+  .statusLine{ font-weight:900; text-align:center; }
+  .mini{ font-size:11px; line-height:1.35; white-space:pre-line; }
+
+  /* Nunca imprimir botões/nav */
+  button, .nav, .topbar { display:none !important; }
+</style>
+
+<style>
+
+/* Ajuste de compactação do Parecer Técnico (tela + impressão) */
+#relParecerPrint .mini, #relParecerPrint #relMotivo, #relParecerPrint #relMotivo .mini{
+  line-height:1.18 !important;
+}
+#relParecerPrint #relMotivo div{ margin:0 !important; }
+
+
+@media print{
+  #relParecerPrint .mini, #relParecerPrint #relMotivo, #relParecerPrint #relMotivo .mini{ line-height:1.12 !important; }
+  #relParecerPrint #relMotivo div{ margin:0 !important; }
+}
+
+</style>
+
+<style>
+
+/* Parecer técnico — sem espaços entre parágrafos e bordas alinhadas */
+#relParecerPrint .mini{line-height:1.15 !important;}
+#relParecerPrint .mini b{font-weight:900;}
+#relParecerPrint #relMotivo{color:var(--text) !important;}
+#relParecerPrint #relMotivo .mini{margin:0 !important;padding:0 !important;text-align:justify;text-justify:inter-word;hyphens:auto;}
+#relParecerPrint #relMotivo div{margin:0 !important;padding:0 !important;}
+
+</style>
+</head>
+<body>
+${clone.outerHTML}
+</body>
+</html>`;
+  }
+
+  function imprimirRelatorio(){
+    // Atualiza dados do relatório (função já existente no app)
+    try{ if(typeof renderRelatorio === 'function') renderRelatorio(); }catch(e){}
+
+    const html = buildPrintHTML();
+    if(!html) return;
+
+    // Imprime via iframe (sem popup e sem travar)
+    const iframe = document.createElement('iframe');
+    iframe.style.position='fixed';
+    iframe.style.right='0';
+    iframe.style.bottom='0';
+    iframe.style.width='0';
+    iframe.style.height='0';
+    iframe.style.border='0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    iframe.onload = ()=>{
+      try{
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } finally {
+        // remove depois de um tempo para não acumular
+        setTimeout(()=>{ try{ iframe.remove(); }catch(e){} }, 1500);
+      }
+    };
+  }
+
+  // Reaponta os botões para o método estável (PDF = salvar como PDF)
+  if($('btnPrint')) $('btnPrint').onclick = imprimirRelatorio;
+  // if($('btnPdfFile')) $('btnPdfFile').onclick = imprimirRelatorio;
+
+})();
+
+// --- Assinaturas (canvas) ---
+function _sigNowText(){
+  const d = (document.getElementById('relData')?.textContent || document.getElementById('id_data')?.value || '').trim();
+  const h = (document.getElementById('relHora')?.textContent || document.getElementById('id_hora')?.value || '').trim();
+  if(d && d!=='—' && h && h!=='—') return `${d} ${h}`;
+  return new Date().toLocaleString('pt-BR');
+}
+
+function initSignaturePad(canvasId, clearBtnId, storageKey){
+  const cv = document.getElementById(canvasId);
+  const btn = document.getElementById(clearBtnId);
+  if(!cv) return;
+
+  const ctx = cv.getContext('2d');
+  const state = {down:false, lastX:0, lastY:0};
+
+  const getPos = (ev)=>{
+    const r = cv.getBoundingClientRect();
+    const t = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+    return {x: (t.clientX - r.left) * (cv.width / r.width), y: (t.clientY - r.top) * (cv.height / r.height)};
+  };
+
+  const save = ()=>{
+    try{ localStorage.setItem(storageKey, cv.toDataURL('image/png')); }catch(e){}
+  };
+
+  const restore = ()=>{
+    try{
+      const data = localStorage.getItem(storageKey);
+      if(!data) return;
+      const img = new Image();
+      img.onload = ()=>{ ctx.clearRect(0,0,cv.width,cv.height); ctx.drawImage(img,0,0,cv.width,cv.height); };
+      img.src = data;
+    }catch(e){}
+  };
+
+  const start = (ev)=>{
+    ev.preventDefault();
+    const p = getPos(ev);
+    state.down = true;
+    state.lastX = p.x; state.lastY = p.y;
+  };
+
+  const move = (ev)=>{
+    if(!state.down) return;
+    ev.preventDefault();
+    const p = getPos(ev);
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(state.lastX, state.lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    state.lastX = p.x; state.lastY = p.y;
+  };
+
+  const end = (ev)=>{
+    if(!state.down) return;
+    ev.preventDefault();
+    state.down = false;
+    save();
+  };
+
+  cv.addEventListener('mousedown', start);
+  cv.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+
+  cv.addEventListener('touchstart', start, {passive:false});
+  cv.addEventListener('touchmove', move, {passive:false});
+  window.addEventListener('touchend', end, {passive:false});
+
+  if(btn){
+    btn.addEventListener('click', ()=>{
+      ctx.clearRect(0,0,cv.width,cv.height);
+      try{ localStorage.removeItem(storageKey); }catch(e){}
+    });
+  }
+
+  restore();
+}
+
+
+function swapSigToImg(enable){
+  const pairs = [
+    {cv:'sig_canvas_operador', key:'sig_operador_v1'},
+    {cv:'sig_canvas_encarregado', key:'sig_encarregado_v1'}
+  ];
+  pairs.forEach(p=>{
+    const cv = document.getElementById(p.cv);
+    if(!cv) return;
+    const existing = document.querySelector('img[data-sigimg-for="'+p.cv+'"]');
+    if(enable){
+      let data = null;
+      try{ data = localStorage.getItem(p.key); }catch(e){}
+      try{ if(!data) data = cv.toDataURL('image/png'); }catch(e){}
+      if(!data) return;
+      let img = existing;
+      if(!img){
+        img = document.createElement('img');
+        img.setAttribute('data-sigimg-for', p.cv);
+        img.style.width = '100%';
+        img.style.height = '180px';
+        img.style.objectFit = 'contain';
+        img.style.border = '1px dashed #cbd5e1';
+        img.style.borderRadius = '12px';
+        img.style.background = '#fff';
+        cv.insertAdjacentElement('afterend', img);
+      }
+      img.src = data;
+      cv.style.display = 'none';
+      img.style.display = 'block';
+    }else{
+      if(existing) existing.remove();
+      cv.style.display = '';
+    }
+  });
+}
+
+function swapSigNamesToText(enable){
+  const items = [
+    {inp:'sig_nome_operador', holder:'sig_nome_operador__print'},
+    {inp:'sig_nome_encarregado', holder:'sig_nome_encarregado__print'}
+  ];
+  items.forEach(it=>{
+    const input = document.getElementById(it.inp);
+    if(!input) return;
+    const existing = document.getElementById(it.holder);
+    if(enable){
+      let span = existing;
+      if(!span){
+        span = document.createElement('div');
+        span.id = it.holder;
+        span.style.marginTop = '6px';
+        span.style.fontWeight = '800';
+        span.style.fontSize = '13px';
+        span.style.color = '#0f172a';
+        input.insertAdjacentElement('afterend', span);
+      }
+      span.textContent = input.value || '—';
+      input.style.display = 'none';
+      span.style.display = 'block';
+    }else{
+      if(existing) existing.remove();
+      input.style.display = '';
+    }
+  });
+}
+
+
+
+function setValueAttrs(root){
+  try{
+    const el = (root && root.querySelectorAll) ? root : document;
+    el.querySelectorAll('input,textarea,select').forEach(n=>{
+      if(n.tagName==='SELECT'){
+        n.querySelectorAll('option').forEach(opt=>{ opt.selected = (opt.value===n.value); });
+      }else if(n.type==='checkbox' || n.type==='radio'){
+        if(n.checked) n.setAttribute('checked','checked'); else n.removeAttribute('checked');
+      }else{
+        n.setAttribute('value', n.value || '');
+      }
+    });
+  }catch(e){}
+}
+
+function initAssinaturas(){
+  initSignaturePad('sig_canvas_operador','sig_clear_operador','sig_operador_v1');
+  initSignaturePad('sig_canvas_encarregado','sig_clear_encarregado','sig_encarregado_v1');}
+</script>
+
+</body>
+</html>
