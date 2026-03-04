@@ -872,8 +872,10 @@
  $('relSup').textContent = $('id_supervisor').value || '—';
  $('relTecSeg').textContent = ($('id_tecnico_seguranca') && $('id_tecnico_seguranca').value) ? $('id_tecnico_seguranca').value : '—';
  // Autofill nomes de assinatura (se vazio)
- if($('sig_nome_operador') && !$('sig_nome_operador').value.trim()) $('sig_nome_operador').value = $('id_operador').value || '';
- if($('sig_nome_encarregado') && !$('sig_nome_encarregado').value.trim()) $('sig_nome_encarregado').value = ($('id_supervisor')?$('id_supervisor').value:'') || '';
+//  if($('sig_nome_operador') && !$('sig_nome_operador').value.trim()) $('sig_nome_operador').value = $('id_operador').value || '';
+ if($('sig_nome_operador')) $('sig_nome_operador').value = $('id_operador').value || '';
+//  if($('sig_nome_encarregado') && !$('sig_nome_encarregado').value.trim()) {
+ if($('sig_nome_encarregado')) $('sig_nome_encarregado').value = ($('id_supervisor')?$('id_supervisor').value:'') || '';
  // Carimba data/hora nos 3 campos
  const _dt = _sigNowText();
  if($('sig_dt_operador')) $('sig_dt_operador').textContent = _dt;
